@@ -7,6 +7,22 @@
       "contrasena": "Admin123",
       "rol": "admin",
       "estado": "activo"
+    },
+    {
+      "id": "2",
+      "nombre": "Paciente Prueba",
+      "correo": "paciente@controldental.com",
+      "contrasena": "Paciente123",
+      "rol": "paciente",
+      "estado": "activo"
+    },
+    {
+      "id": "3",
+      "nombre": "Administrador Inactivo",
+      "correo": "inactivo@controldental.com",
+      "contrasena": "Inactivo123",
+      "rol": "admin",
+      "estado": "inactivo"
     }
   ],
   "tratamientos": [],

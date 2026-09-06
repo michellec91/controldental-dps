@@ -1,8 +1,26 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import LoginForm from "../../features/autenticacion/components/LoginForm";
+import { useAuth } from "../../context/AuthContext";
 import styles from "./page.module.css";
 
 export default function LoginPage() {
+  const { usuario, cargando } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!cargando && usuario) {
+      router.replace("/admin-prueba");
+    }
+  }, [usuario, cargando, router]);
+
+  if (cargando || usuario) {
+    return null;
+  }
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
