@@ -1,11 +1,69 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./LoginForm.module.css";
+import { obtenerUsuarioPorCorreo } from "../../../services/usuariosService";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function LoginForm() {
+  const [correo, setCorreo] = useState("");
+  const [contrasena, setContrasena] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(false);
+
+  const { iniciarSesion } = useAuth();
+  const router = useRouter();
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+
+    if (!correo.trim() || !contrasena.trim()) {
+      setError("Ingresa tu correo electrónico y contraseña.");
+      return;
+    }
+
+    try {
+      setCargando(true);
+
+      const usuario = await obtenerUsuarioPorCorreo(correo.trim());
+
+      if (!usuario || usuario.contrasena !== contrasena) {
+        setError("Correo electrónico o contraseña incorrectos.");
+        return;
+      }
+
+      if (usuario.rol !== "admin") {
+        setError("Esta cuenta no tiene permisos administrativos.");
+        return;
+      }
+
+      if (usuario.estado !== "activo") {
+        setError("Esta cuenta no se encuentra activa.");
+        return;
+      }
+
+      iniciarSesion({
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        rol: usuario.rol,
+        estado: usuario.estado,
+      });
+
+      // Temporal mientras Silvia desarrolla el dashboard.
+      router.push("/");
+    } catch {
+      setError(
+        "No fue posible conectar con el servidor. Verifica que la API esté activa."
+      );
+    } finally {
+      setCargando(false);
+    }
+  }
 
   return (
     <section className={styles.card} aria-labelledby="login-title">
@@ -27,10 +85,7 @@ export default function LoginForm() {
           Ingresa tus credenciales para continuar.
         </p>
 
-        <form
-          className={styles.form}
-          onSubmit={(event) => event.preventDefault()}
-        >
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.fieldGroup}>
             <label htmlFor="email" className={styles.label}>
               Correo electrónico
@@ -52,6 +107,8 @@ export default function LoginForm() {
                 placeholder="nombre@clinica.com"
                 className={styles.input}
                 autoComplete="email"
+                value={correo}
+                onChange={(event) => setCorreo(event.target.value)}
               />
             </div>
           </div>
@@ -86,6 +143,8 @@ export default function LoginForm() {
                 placeholder="••••••••"
                 className={styles.input}
                 autoComplete="current-password"
+                value={contrasena}
+                onChange={(event) => setContrasena(event.target.value)}
               />
 
               <button
@@ -108,15 +167,36 @@ export default function LoginForm() {
             </div>
           </div>
 
-          <button type="submit" className={styles.loginButton}>
-            <span>Iniciar sesión</span>
+          {error && (
+            <p
+              style={{
+                margin: 0,
+                color: "#d32f2f",
+                fontSize: "11px",
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </p>
+          )}
 
-            <Image
-              src="/assets/IMG_5.svg"
-              alt=""
-              width={16}
-              height={16}
-            />
+          <button
+            type="submit"
+            className={styles.loginButton}
+            disabled={cargando}
+          >
+            <span>
+              {cargando ? "Verificando..." : "Iniciar sesión"}
+            </span>
+
+            {!cargando && (
+              <Image
+                src="/assets/IMG_5.svg"
+                alt=""
+                width={16}
+                height={16}
+              />
+            )}
           </button>
 
           <div className={styles.divider}>

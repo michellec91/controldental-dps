@@ -1,5 +1,14 @@
 {
-  "usuarios": [],
+  "usuarios": [
+    {
+      "id": "1",
+      "nombre": "Administrador",
+      "correo": "admin@controldental.com",
+      "contrasena": "Admin123",
+      "rol": "admin",
+      "estado": "activo"
+    }
+  ],
   "tratamientos": [],
   "citas": []
 }
