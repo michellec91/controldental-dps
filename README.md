@@ -1,36 +1,258 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Control Dental
 
-## Getting Started
+Proyecto desarrollado para la asignatura **Diseño y Programación de Software Multiplataforma (DPS941)**.
 
-First, run the development server:
+## Etapa 2 - Desarrollo Web
+
+Esta etapa corresponde al desarrollo de la plataforma web administrativa de **Control Dental**, una solución para apoyar la gestión de citas y tratamientos de la Clínica Dental Sonrisas.
+
+## Tecnologías utilizadas
+
+- React
+- Next.js
+- TypeScript
+- Node.js
+- npm
+- JSON Server
+- db.json
+- Git
+- GitHub
+
+## Requisitos previos
+
+Antes de ejecutar el proyecto se debe tener instalado:
+
+- Node.js
+- npm
+- Git
+- Visual Studio Code
+
+## Instalación
+
+Después de clonar el repositorio, ingresar a la carpeta del proyecto y ejecutar:
+
+```bash
+npm install
+```
+
+Este comando instalará las dependencias necesarias definidas en `package.json`.
+
+## Ejecutar la aplicación web
+
+Para iniciar Next.js:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La aplicación estará disponible en:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+La terminal donde se ejecuta este comando debe permanecer abierta mientras se trabaja con la aplicación.
 
-## Learn More
+## Ejecutar la API REST
 
-To learn more about Next.js, take a look at the following resources:
+Para iniciar JSON Server, abrir una terminal adicional y ejecutar:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run api
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+La API estará disponible en:
 
-## Deploy on Vercel
+```text
+http://localhost:3001
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Endpoints principales:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+http://localhost:3001/usuarios
+http://localhost:3001/tratamientos
+http://localhost:3001/citas
+```
+
+Para trabajar con la aplicación y la API al mismo tiempo deben permanecer activos:
+
+```text
+npm run dev   → Next.js / puerto 3000
+npm run api   → JSON Server / puerto 3001
+```
+
+## Estructura principal del proyecto
+
+```text
+src/
+├── app/
+├── components/
+├── context/
+├── features/
+│   ├── autenticacion/
+│   ├── tratamientos/
+│   ├── solicitudes/
+│   ├── agenda/
+│   └── dashboard-perfil/
+├── hooks/
+├── services/
+└── utils/
+```
+
+### Función de las carpetas
+
+- `app`: páginas, rutas y estructura principal de Next.js.
+- `components`: componentes reutilizables de la interfaz.
+- `context`: manejo de estado global mediante Context API.
+- `features`: módulos funcionales asignados a cada integrante.
+- `hooks`: hooks personalizados de React.
+- `services`: funciones relacionadas con la comunicación con la API REST.
+- `utils`: funciones auxiliares y validaciones reutilizables.
+
+## División del equipo
+
+| Integrante | Módulo | Rama |
+|---|---|---|
+| Sara | Autenticación y control de acceso | `feature/autenticacion` |
+| Andrés | Gestión de tratamientos | `feature/tratamientos` |
+| Jehudi | Solicitudes de citas | `feature/solicitudes` |
+| Francisco | Agenda administrativa | `feature/agenda` |
+| Silvia | Dashboard y perfil | `feature/dashboard-perfil` |
+
+## Flujo de trabajo con Git
+
+Todos los integrantes trabajarán sobre el mismo repositorio.
+
+Después de aceptar la invitación como colaborador, cada integrante debe clonar el repositorio:
+
+```bash
+git clone https://github.com/michellec91/controldental-dps.git
+```
+
+Después debe ingresar a la carpeta del proyecto:
+
+```bash
+cd controldental-dps
+```
+
+Instalar las dependencias:
+
+```bash
+npm install
+```
+
+### Crear la rama asignada
+
+Cada integrante debe crear únicamente la rama correspondiente a su módulo.
+
+Ejemplo para autenticación:
+
+```bash
+git checkout -b feature/autenticacion
+```
+
+Las ramas asignadas son:
+
+```text
+feature/autenticacion
+feature/tratamientos
+feature/solicitudes
+feature/agenda
+feature/dashboard-perfil
+```
+
+Para comprobar en qué rama se está trabajando:
+
+```bash
+git branch
+```
+
+La rama activa aparecerá marcada con `*`.
+
+## Guardar y subir cambios
+
+Después de realizar cambios:
+
+```bash
+git add .
+```
+
+Crear un commit descriptivo:
+
+```bash
+git commit -m "Descripción del cambio realizado"
+```
+
+La primera vez que se suba una rama a GitHub:
+
+```bash
+git push -u origin nombre-de-la-rama
+```
+
+Ejemplo:
+
+```bash
+git push -u origin feature/autenticacion
+```
+
+Después de establecer la conexión de la rama, los siguientes cambios podrán subirse con:
+
+```bash
+git push
+```
+
+## Importante
+
+No se debe desarrollar directamente sobre la rama:
+
+```text
+main
+```
+
+Cada integrante debe trabajar únicamente en su rama asignada.
+
+Los cambios serán integrados posteriormente a `main` después de ser revisados y probados.
+
+## Base de datos de prueba
+
+Durante la Etapa 2 se utilizará `db.json` como base de datos de prueba y JSON Server como API REST.
+
+Actualmente contiene las colecciones:
+
+```json
+{
+  "usuarios": [],
+  "tratamientos": [],
+  "citas": []
+}
+```
+
+### Uso de las colecciones
+
+- `usuarios`: autenticación, roles y perfiles.
+- `tratamientos`: información de los tratamientos odontológicos.
+- `citas`: solicitudes, agenda y estados de las citas.
+
+Las solicitudes de citas se manejarán dentro de `citas` mediante estados como:
+
+```text
+pendiente
+confirmada
+rechazada
+cancelada
+```
+
+## Puertos utilizados
+
+| Servicio | Puerto |
+|---|---:|
+| Next.js | 3000 |
+| JSON Server | 3001 |
+
+## Proyecto académico
+
+**Universidad Don Bosco**  
+Diseño y Programación de Software Multiplataforma - DPS941  
+Grupo C - Nova Tech  
+Proyecto: **Control Dental**
