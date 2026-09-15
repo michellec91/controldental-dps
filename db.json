@@ -1,5 +1,23 @@
 {
   "usuarios": [],
-  "tratamientos": [],
-  "citas": []
+  "tratamientos": [
+    {
+      "name": "Odontología preventiva",
+      "content": "Limpiezas dentales profesionales (tartrectomías), aplicación de flúor y selladores para evitar caries.",
+      "cost": "45",
+      "duration": "30 min - 45 min",
+      "image": "foto1-1789407572483.jpg",
+      "id": "1"
+    },
+    {
+      "name": "Ortodoncia",
+      "content": "Uso de brackets o alineadores transparentes para corregir la posición de los dientes y la mordida.",
+      "cost": "50",
+      "duration": "50 min - 1 h",
+      "image": "foto2-1789488347184.jpg",
+      "id": "2"
+    }
+  ],
+  "citas": [],
+  "$schema": "./node_modules/json-server/schema.json"
 }
