@@ -21,6 +21,8 @@ export default function EditarTratamiento({ params }) {
     const [preview, setPreview] = useState('');
     const [uploading, setUploading] = useState(false);
 
+    const [errors, setErrors] = useState({});
+
     const { startUpload } = useUploadThing("imageUploader");
     useEffect(() => {
         if (!id) return;
@@ -44,14 +46,90 @@ export default function EditarTratamiento({ params }) {
         fetchTratamiento();
     }, [id]);
 
+    const validate = {
+        name: (value) => {
+            if (!value.trim()) return 'El nombre es obligatorio'
+            if (value.trim().length < 3) return 'El nombre debe tener al menos 3 caracteres'
+            if (value.trim().length > 100) return 'El nombre no puede superar 100 caracteres'
+            return ''
+        },
+        content: (value) => {
+            if (!value.trim()) return 'La descripción es obligatoria'
+            if (value.trim().length < 10) return 'La descripción debe tener al menos 10 caracteres'
+            if (value.trim().length > 500) return 'La descripción no puede superar 500 caracteres'
+            return ''
+        },
+        cost: (value) => {
+            if (!value.toString().trim()) return 'El costo es obligatorio'
+            if (!/^\d+(\.\d{1,2})?$/.test(value.toString().trim())) {
+                return 'Usa solo números (ej: 25 o 25.50)'
+            }
+            if (parseFloat(value) <= 0) return 'El costo debe ser mayor a 0'
+            return ''
+        },
+        duration: (value) => {
+            if (!value.trim()) return 'La duración es obligatoria'
+            if (value.trim().length < 3) return 'La duración debe tener al menos 3 caracteres'
+            if (value.trim().length > 50) return 'La duración no puede superar 50 caracteres'
+            return ''
+        },
+    }
+
+    const validateForm = () => {
+        const newErrors = {
+            name: validate.name(name),
+            content: validate.content(content),
+            cost: validate.cost(cost),
+            duration: validate.duration(duration),
+            file: errors.file || '',
+        }
+        setErrors(newErrors)
+        return Object.values(newErrors).every((e) => !e)
+    }
+
+    const handleBlur = (field) => {
+        let error = ''
+        if (field === 'name') error = validate.name(name)
+        if (field === 'content') error = validate.content(content)
+        if (field === 'cost') error = validate.cost(cost)
+        if (field === 'duration') error = validate.duration(duration)
+        setErrors((prev) => ({ ...prev, [field]: error }))
+    }
+
+    const inputClass = (field) => {
+        const base = "w-full px-3.5 py-2.5 border rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow"
+        if (errors[field]) {
+            return `${base} border-red-500 focus:ring-red-500 focus:border-red-500`
+        }
+        return `${base} border-gray-300 focus:ring-blue-500 focus:border-blue-500`
+    }
+
     const handleFileChange = (e) => {
         const selected = e.target.files[0] || null;
-        setFile(selected);
 
         if (selected) {
+            if (selected.size > 4 * 1024 * 1024) {
+                setErrors((prev) => ({ ...prev, file: 'La imagen no puede superar 4 MB' }))
+                e.target.value = ''
+                setFile(null)
+                setPreview('')
+                return
+            }
+
+            if (!selected.type.startsWith('image/')) {
+                setErrors((prev) => ({ ...prev, file: 'Solo se permiten imágenes' }))
+                e.target.value = ''
+                setFile(null)
+                setPreview('')
+                return
+            }
+
+            setFile(selected)
+            setErrors((prev) => ({ ...prev, file: '' }))
             const objectUrl = URL.createObjectURL(selected);
             setPreview(objectUrl);
         } else {
+            setFile(null);
             setPreview('');
         }
     }
@@ -70,6 +148,8 @@ export default function EditarTratamiento({ params }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (uploading) return;
+
+        if (!validateForm()) return;
 
         let newImageUrl = image;
         let uploadedNewImage = false;
@@ -137,7 +217,6 @@ export default function EditarTratamiento({ params }) {
 
     const handleDelete = async () => {
         try {
-            // 1) Borrar de UploadThing si es URL externa
             if (image && image.startsWith('http')) {
                 await fetch('/api/delete-uploadthing', {
                     method: 'POST',
@@ -146,7 +225,6 @@ export default function EditarTratamiento({ params }) {
                 });
             }
 
-            // 2) Borrar el registro en json-server
             const response = await fetch(`http://localhost:3001/tratamientos/${id}`, {
                 method: 'DELETE',
             });
@@ -183,12 +261,19 @@ export default function EditarTratamiento({ params }) {
                                 <input
                                     id="name"
                                     type="text"
-                                    placeholder="Ej: Limpieza dental básica"
+                                    placeholder="Ingresa el nombre del tratamiento..."
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => {
+                                        setName(e.target.value)
+                                        if (errors.name) setErrors((prev) => ({ ...prev, name: '' }))
+                                    }}
+                                    onBlur={() => handleBlur('name')}
                                     required
-                                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
+                                    className={inputClass('name')}
                                 />
+                                {errors.name && (
+                                    <p className="text-xs text-red-600 mt-1">{errors.name}</p>
+                                )}
                             </div>
 
                             <div>
@@ -197,13 +282,27 @@ export default function EditarTratamiento({ params }) {
                                 </label>
                                 <textarea
                                     id="content"
-                                    placeholder="Describe brevemente el tratamiento..."
+                                    placeholder="Descripcion del tratamiento..."
                                     value={content}
-                                    onChange={(e) => setContent(e.target.value)}
+                                    onChange={(e) => {
+                                        setContent(e.target.value)
+                                        if (errors.content) setErrors((prev) => ({ ...prev, content: '' }))
+                                    }}
+                                    onBlur={() => handleBlur('content')}
                                     required
                                     rows={3}
-                                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none"
+                                    className={`${inputClass('content')} resize-none`}
                                 />
+                                <div className="flex justify-between items-start mt-1 gap-2">
+                                    {errors.content ? (
+                                        <p className="text-xs text-red-600">{errors.content}</p>
+                                    ) : (
+                                        <span />
+                                    )}
+                                    <p className="text-xs text-gray-400 shrink-0">
+                                        {content.length}/500
+                                    </p>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -218,13 +317,24 @@ export default function EditarTratamiento({ params }) {
                                         <input
                                             id="cost"
                                             type="text"
-                                            placeholder="25.00"
+                                            inputMode="decimal"
+                                            placeholder="Ingrese el costo del tratamiento..."
                                             value={cost}
-                                            onChange={(e) => setCost(e.target.value)}
+                                            onChange={(e) => {
+                                                const value = e.target.value
+                                                if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                                    setCost(value)
+                                                    if (errors.cost) setErrors((prev) => ({ ...prev, cost: '' }))
+                                                }
+                                            }}
+                                            onBlur={() => handleBlur('cost')}
                                             required
-                                            className="w-full pl-7 pr-3.5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
+                                            className={`${inputClass('cost')} pl-7`}
                                         />
                                     </div>
+                                    {errors.cost && (
+                                        <p className="text-xs text-red-600 mt-1">{errors.cost}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -234,12 +344,19 @@ export default function EditarTratamiento({ params }) {
                                     <input
                                         id="duration"
                                         type="text"
-                                        placeholder="Ej: 30 min - 45 min"
+                                        placeholder="Ingrese la duración del tratamiento..."
                                         value={duration}
-                                        onChange={(e) => setDuration(e.target.value)}
+                                        onChange={(e) => {
+                                            setDuration(e.target.value)
+                                            if (errors.duration) setErrors((prev) => ({ ...prev, duration: '' }))
+                                        }}
+                                        onBlur={() => handleBlur('duration')}
                                         required
-                                        className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
+                                        className={inputClass('duration')}
                                     />
+                                    {errors.duration && (
+                                        <p className="text-xs text-red-600 mt-1">{errors.duration}</p>
+                                    )}
                                 </div>
                             </div>
 
