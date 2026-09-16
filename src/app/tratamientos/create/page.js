@@ -1,9 +1,10 @@
 "use client"
 import { useRouter } from "next/navigation"
+import { useUploadThing } from "../../../lib/uploadthing-client"
 import Navbar from "../../../components/Navbar"
 import Link from "next/link"
 import React, { useState } from 'react'
-import { FaArrowLeft, FaSave, FaUpload, FaImage } from "react-icons/fa"
+import { FaArrowLeft, FaSave, FaUpload, FaTimes } from "react-icons/fa"
 
 const Create = () => {
     const [name, setName] = useState('')
@@ -11,38 +12,66 @@ const Create = () => {
     const [cost, setCost] = useState('')
     const [duration, setDuration] = useState('')
     const [file, setFile] = useState(null)
+    const [uploading, setUploading] = useState(false)
 
     const router = useRouter()
 
+    const { startUpload } = useUploadThing("imageUploader")
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (uploading) return
+
+        let imageUrl = ''
+
         try {
-            let imageName = 'placeholder.png'
+            imageUrl = '/images/tratamientos/placeholder.png'
 
+            // 1) Si hay archivo → súbelo
             if (file) {
-                const formData = new FormData()
-                formData.append('file', file)
+                setUploading(true)
+                const uploaded = await startUpload([file])
 
-                const uploadRes = await fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData,
-                })
+                if (!uploaded || !uploaded[0]) {
+                    throw new Error('Error al subir la imagen')
+                }
 
-                if (!uploadRes.ok) throw new Error('Error al subir imagen')
-                const uploadData = await uploadRes.json()
-                imageName = uploadData.filename
+                imageUrl = uploaded[0].url
+                setUploading(false)
             }
 
             const response = await fetch('http://localhost:3001/tratamientos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, content, cost, duration, image: imageName }),
+                body: JSON.stringify({
+                    name,
+                    content,
+                    cost,
+                    duration,
+                    image: imageUrl,
+                }),
             })
             if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
             router.push('/tratamientos')
+
         } catch (error) {
+            setUploading(false)
             console.error('Error al crear tratamiento:', error)
+
+            if (imageUrl && imageUrl.startsWith('http')) {
+                try {
+                    await fetch('/api/delete-uploadthing', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: imageUrl }),
+                    })
+                } catch (cleanupError) {
+                    console.error('Error al limpiar imagen huérfana:', cleanupError)
+                }
+            }
+
+            alert('Hubo un error al crear el tratamiento. Inténtalo de nuevo.')
         }
     }
 
@@ -136,17 +165,36 @@ const Create = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                     Imagen del tratamiento
                                 </label>
+
                                 <div className="flex items-center gap-3">
                                     <label
                                         htmlFor="file"
                                         className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                                     >
                                         <FaUpload size={12} />
-                                        <span>Elegir archivo</span>
+                                        <span>{file ? 'Cambiar archivo' : 'Elegir archivo'}</span>
                                     </label>
-                                    <span className="text-sm text-gray-500 truncate">
-                                        {file ? file.name : 'Ningún archivo seleccionado'}
-                                    </span>
+
+                                    {file ? (
+                                        <>
+                                            <span className="text-sm text-gray-500 truncate max-w-[200px]">
+                                                {file.name}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFile(null)}
+                                                className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700"
+                                            >
+                                                <FaTimes size={11} />
+                                                Quitar
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <span className="text-sm text-gray-500">
+                                            Ningún archivo seleccionado
+                                        </span>
+                                    )}
+
                                     <input
                                         id="file"
                                         type="file"
@@ -158,9 +206,13 @@ const Create = () => {
                             </div>
 
                             <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
-                                <button type="submit" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                                <button
+                                    type="submit"
+                                    disabled={uploading}
+                                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm"
+                                >
                                     <FaSave size={14} />
-                                    Registrar tratamiento
+                                    {uploading ? 'Subiendo imagen...' : 'Registrar tratamiento'}
                                 </button>
                                 <button
                                     type="button"

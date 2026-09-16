@@ -1,9 +1,10 @@
 "use client"
 
 import { useRouter } from 'next/navigation';
+import { useUploadThing } from "../../../lib/uploadthing-client"
 import Navbar from "../../../components/Navbar"
 import React, { use, useEffect, useState } from 'react';
-import { FaArrowLeft, FaSave, FaTrash, FaUpload, FaTimes } from "react-icons/fa"
+import { FaSave, FaTrash, FaUpload, FaTimes } from "react-icons/fa"
 
 export default function EditarTratamiento({ params }) {
     const resolveParams = use(params);
@@ -15,9 +16,12 @@ export default function EditarTratamiento({ params }) {
     const [cost, setCost] = useState('');
     const [duration, setDuration] = useState('');
     const [image, setImage] = useState('');
+    const [originalImage, setOriginalImage] = useState('');
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState('');
+    const [uploading, setUploading] = useState(false);
 
+    const { startUpload } = useUploadThing("imageUploader");
     useEffect(() => {
         if (!id) return;
 
@@ -31,6 +35,7 @@ export default function EditarTratamiento({ params }) {
                 setCost(data.cost || '');
                 setDuration(data.duration || '');
                 setImage(data.image || '');
+                setOriginalImage(data.image || '');
             } catch (error) {
                 console.error('Error al obtener tratamiento:', error);
             }
@@ -51,7 +56,6 @@ export default function EditarTratamiento({ params }) {
         }
     }
 
-    // Limpiar el objectURL cuando ya no se use
     useEffect(() => {
         return () => {
             if (preview) URL.revokeObjectURL(preview);
@@ -65,28 +69,23 @@ export default function EditarTratamiento({ params }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (uploading) return;
+
+        let newImageUrl = image;
+        let uploadedNewImage = false;
+
         try {
-            let newImageName = image;
-
             if (file) {
-                const formData = new FormData();
-                formData.append('file', file);
+                setUploading(true);
+                const uploaded = await startUpload([file]);
 
-                const uploadRes = await fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-                if (!uploadRes.ok) throw new Error('Error al subir nueva imagen');
-                const uploadData = await uploadRes.json();
-                newImageName = uploadData.filename;
-
-                if (image && !image.includes('placeholder')) {
-                    await fetch('/api/delete-image', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ filename: image }),
-                    });
+                if (!uploaded || !uploaded[0]) {
+                    throw new Error('Error al subir la imagen');
                 }
+
+                newImageUrl = uploaded[0].url;
+                uploadedNewImage = true;
+                setUploading(false);
             }
 
             const response = await fetch(`http://localhost:3001/tratamientos/${id}`, {
@@ -97,27 +96,57 @@ export default function EditarTratamiento({ params }) {
                     content,
                     cost,
                     duration,
-                    image: newImageName || 'placeholder.png',
+                    image: newImageUrl || '/images/tratamientos/placeholder.png',
                 }),
             });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
+            if (uploadedNewImage && originalImage && originalImage.startsWith('http')) {
+                try {
+                    await fetch('/api/delete-uploadthing', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: originalImage }),
+                    });
+                } catch (cleanupError) {
+                    console.error('Error al borrar imagen vieja:', cleanupError);
+                }
+            }
+
             router.push('/tratamientos');
+
         } catch (error) {
+            setUploading(false);
             console.error('Error al actualizar tratamiento:', error);
+
+            if (uploadedNewImage && newImageUrl && newImageUrl.startsWith('http')) {
+                try {
+                    await fetch('/api/delete-uploadthing', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: newImageUrl }),
+                    });
+                } catch (cleanupError) {
+                    console.error('Error al limpiar imagen huérfana:', cleanupError);
+                }
+            }
+
+            alert('Hubo un error al actualizar el tratamiento. Inténtalo de nuevo.');
         }
     };
 
     const handleDelete = async () => {
         try {
-            if (image && !image.includes('placeholder')) {
-                await fetch('/api/delete-image', {
+            // 1) Borrar de UploadThing si es URL externa
+            if (image && image.startsWith('http')) {
+                await fetch('/api/delete-uploadthing', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ filename: image }),
+                    body: JSON.stringify({ url: image }),
                 });
             }
 
+            // 2) Borrar el registro en json-server
             const response = await fetch(`http://localhost:3001/tratamientos/${id}`, {
                 method: 'DELETE',
             });
@@ -129,8 +158,7 @@ export default function EditarTratamiento({ params }) {
         }
     };
 
-    // Imagen que se ve en el preview: la nueva (blob) o la actual
-    const previewSrc = preview || `/images/tratamientos/${image || 'placeholder.png'}`;
+    const previewSrc = preview || (image?.startsWith('http') ? image : `/images/tratamientos/${image || 'placeholder.png'}`);
 
     return (
         <>
@@ -221,7 +249,7 @@ export default function EditarTratamiento({ params }) {
                                 </label>
 
                                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                                    <img src={previewSrc} alt={name || 'Tratamiento'} onError={(e) => { e.currentTarget.src = '/images/tratamientos/placeholder.png'}} className="w-24 h-24 object-cover rounded-lg border border-gray-200 shadow-sm shrink-0"/>
+                                    <img src={previewSrc} alt={name || 'Tratamiento'} onError={(e) => { e.currentTarget.src = '/images/tratamientos/placeholder.png' }} className="w-24 h-24 object-cover rounded-lg border border-gray-200 shadow-sm shrink-0" />
 
                                     <div className="flex-1 min-w-0 w-full">
                                         <div className="flex items-center gap-3 flex-wrap">
@@ -237,7 +265,7 @@ export default function EditarTratamiento({ params }) {
                                                 </button>
                                             )}
 
-                                            <input id="file" type="file" accept="image/*" onChange={handleFileChange} className="hidden"/>
+                                            <input id="file" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                                         </div>
 
                                         <p className="text-xs text-gray-500 mt-2 truncate">
@@ -262,11 +290,13 @@ export default function EditarTratamiento({ params }) {
                                 </button>
 
                                 <div className="flex flex-col-reverse sm:flex-row gap-3 w-full sm:w-auto">
-                                    <button type="submit"
-                                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                                    <button
+                                        type="submit"
+                                        disabled={uploading}
+                                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm"
                                     >
                                         <FaSave size={14} />
-                                        Guardar cambios
+                                        {uploading ? 'Subiendo imagen...' : 'Guardar cambios'}
                                     </button>
                                     <button type="button" onClick={() => router.push('/tratamientos')} className="w-full sm:w-auto px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">
                                         Cancelar

@@ -36,12 +36,16 @@ export default function Tratamientos() {
         try {
             const tratamiento = tratamientos.find(t => t.id === id)
 
-            if (tratamiento?.image && !tratamiento.image.includes('placeholder')) {
-                await fetch('/api/delete-image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ filename: tratamiento.image }),
-                })
+            if (tratamiento?.image?.startsWith('http')) {
+                try {
+                    await fetch('/api/delete-uploadthing', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: tratamiento.image }),
+                    })
+                } catch (cleanupError) {
+                    console.error('No se pudo borrar la imagen de UploadThing:', cleanupError)
+                }
             }
 
             const response = await fetch(`http://localhost:3001/tratamientos/${id}`, {
@@ -147,7 +151,11 @@ export default function Tratamientos() {
                                     <tr key={tratamiento.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 border border-gray-200">
                                             <img
-                                                src={`/images/tratamientos/${tratamiento.image || 'placeholder.png'}`}
+                                                src={
+                                                    tratamiento.image?.startsWith('http')
+                                                        ? tratamiento.image
+                                                        : `/images/tratamientos/${tratamiento.image || 'placeholder.png'}`
+                                                }
                                                 alt={tratamiento.name}
                                                 onError={(e) => {
                                                     e.currentTarget.src = '/images/tratamientos/placeholder.png'
@@ -201,7 +209,11 @@ export default function Tratamientos() {
                                 className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex gap-4"
                             >
                                 <img
-                                    src={`/images/tratamientos/${tratamiento.image || 'placeholder.png'}`}
+                                    src={
+                                        tratamiento.image?.startsWith('http')
+                                            ? tratamiento.image
+                                            : `/images/tratamientos/${tratamiento.image || 'placeholder.png'}`
+                                    }
                                     alt={tratamiento.name}
                                     onError={(e) => {
                                         e.currentTarget.src = '/images/tratamientos/placeholder.png'
