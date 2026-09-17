@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation"
 import { useUploadThing } from "../../../lib/uploadthing-client"
 import Navbar from "../../../components/Navbar"
+import { alertSuccess, alertError, alertConfirm } from "../../../lib/alert.js"
 import Link from "next/link"
 import React, { useState } from 'react'
 import { FaArrowLeft, FaSave, FaUpload, FaTimes } from "react-icons/fa"
@@ -82,6 +83,7 @@ const Create = () => {
         if (uploading) return
 
         if (!validateForm()) {
+            alertError('Datos incompletos', 'Revisa los campos marcados en rojo.')
             return
         }
 
@@ -90,7 +92,6 @@ const Create = () => {
         try {
             imageUrl = '/images/tratamientos/placeholder.png'
 
-            // 1) Si hay archivo → súbelo
             if (file) {
                 setUploading(true)
                 const uploaded = await startUpload([file])
@@ -117,6 +118,7 @@ const Create = () => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
             router.push('/tratamientos')
+            alertSuccess('¡Creado!', 'El tratamiento se registró correctamente')
 
         } catch (error) {
             setUploading(false)
@@ -134,7 +136,7 @@ const Create = () => {
                 }
             }
 
-            alert('Hubo un error al crear el tratamiento. Inténtalo de nuevo.')
+            alertError('Error al crear', 'Hubo un problema al registrar el tratamiento. Inténtalo de nuevo.')
         }
     }
 

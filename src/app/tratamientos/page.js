@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import Navbar from "../../components/Navbar"
+import { alertSuccess, alertError, alertConfirm } from "../../lib/alert.js"
 import { useEffect, useState } from "react"
 import { FaEdit, FaTrash, FaSearch, FaPlus } from "react-icons/fa"
 
@@ -21,6 +22,7 @@ export default function Tratamientos() {
             setTratamientos(data)
         } catch (error) {
             console.error('Error al obtener tratamientos:', error)
+            alertError('Error de conexión', 'No se pudieron cargar los tratamientos.')
         }
     }
 
@@ -33,9 +35,18 @@ export default function Tratamientos() {
     }, [tratamientos])
 
     const handleDelete = async (id) => {
-        try {
-            const tratamiento = tratamientos.find(t => t.id === id)
+        const tratamiento = tratamientos.find(t => t.id === id)
 
+        const confirmed = await alertConfirm({
+            title: '¿Eliminar tratamiento?',
+            text: `Se eliminará "${tratamiento?.name || 'el tratamiento'}" de forma permanente`,
+            confirmText: 'Sí, eliminar',
+            danger: true,
+        })
+
+        if (!confirmed) return
+
+        try {
             if (tratamiento?.image?.startsWith('http')) {
                 try {
                     await fetch('/api/delete-uploadthing', {
@@ -54,8 +65,11 @@ export default function Tratamientos() {
             if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
             setTratamientos(prev => prev.filter(t => t.id !== id))
+
+            alertSuccess('Eliminado', 'El tratamiento se eliminó correctamente')
         } catch (error) {
             console.error('Error al eliminar tratamiento:', error)
+            alertError('Error', 'No se pudo eliminar el tratamiento. Inténtalo de nuevo.')
         }
     }
 

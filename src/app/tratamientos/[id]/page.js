@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useUploadThing } from "../../../lib/uploadthing-client"
 import Navbar from "../../../components/Navbar"
+import { alertSuccess, alertError, alertConfirm } from "../../../lib/alert.js"
 import React, { use, useEffect, useState } from 'react';
 import { FaSave, FaTrash, FaUpload, FaTimes } from "react-icons/fa"
 
@@ -40,6 +41,7 @@ export default function EditarTratamiento({ params }) {
                 setOriginalImage(data.image || '');
             } catch (error) {
                 console.error('Error al obtener tratamiento:', error);
+                alertError('Error', 'No se pudo cargar el tratamiento.');
             }
         };
 
@@ -149,7 +151,10 @@ export default function EditarTratamiento({ params }) {
         e.preventDefault();
         if (uploading) return;
 
-        if (!validateForm()) return;
+        if (!validateForm()) {
+            alertError('Datos incompletos', 'Revisa los campos marcados en rojo.')
+            return;
+        }
 
         let newImageUrl = image;
         let uploadedNewImage = false;
@@ -194,6 +199,7 @@ export default function EditarTratamiento({ params }) {
             }
 
             router.push('/tratamientos');
+            alertSuccess('¡Actualizado!', 'Los cambios se guardaron correctamente');
 
         } catch (error) {
             setUploading(false);
@@ -211,11 +217,20 @@ export default function EditarTratamiento({ params }) {
                 }
             }
 
-            alert('Hubo un error al actualizar el tratamiento. Inténtalo de nuevo.');
+            alertError('Error al actualizar', 'No se pudieron guardar los cambios. Inténtalo de nuevo.');
         }
     };
 
     const handleDelete = async () => {
+        const confirmed = await alertConfirm({
+            title: '¿Eliminar tratamiento?',
+            text: `Se eliminará "${name}" de forma permanente`,
+            confirmText: 'Sí, eliminar',
+            danger: true,
+        });
+
+        if (!confirmed) return;
+
         try {
             if (image && image.startsWith('http')) {
                 await fetch('/api/delete-uploadthing', {
@@ -231,8 +246,10 @@ export default function EditarTratamiento({ params }) {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
             router.push('/tratamientos');
+            alertSuccess('Eliminado', 'El tratamiento se eliminó correctamente');
         } catch (error) {
             console.error('Error al eliminar tratamiento:', error);
+            alertError('Error', 'No se pudo eliminar el tratamiento.');
         }
     };
 
