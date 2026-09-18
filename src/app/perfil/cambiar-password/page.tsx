@@ -10,9 +10,9 @@ import {
   FaLock,
 } from "react-icons/fa";
 
-import Navbar from "../../components/Navbar";
-import ProtectedRoute from "../../features/autenticacion/components/ProtectedRoute";
-import { useAuth } from "../../context/AuthContext";
+import Navbar from "../../../components/Navbar";
+import ProtectedRoute from "../../../features/autenticacion/components/ProtectedRoute";
+import { useAuth } from "../../../context/AuthContext";
 import styles from "./page.module.css";
 
 export default function CambiarPasswordPage() {

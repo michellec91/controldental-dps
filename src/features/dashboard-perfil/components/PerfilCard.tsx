@@ -242,7 +242,7 @@ export default function PerfilCard() {
           <button
             type="button"
             className={styles.passwordButton}
-            onClick={() => router.push("/cambiar-password")}
+            onClick={() => router.push("/perfil/cambiar-password")}
           >
             Cambiar contraseña
           </button>
