@@ -11,7 +11,9 @@ import {
 interface UsuarioSesion {
   id: string;
   nombre: string;
+  apellido?: string,
   correo: string;
+  telefono?: string,
   rol: string;
   estado: string;
   imagenPerfil?: string;

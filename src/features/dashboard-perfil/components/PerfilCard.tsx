@@ -7,6 +7,7 @@ import {
   FaEnvelope,
   FaLock,
   FaPen,
+  FaPhone,
   FaShieldAlt,
   FaSignOutAlt,
   FaUserCircle,
@@ -131,7 +132,7 @@ export default function PerfilCard() {
           </span>
         </button>
 
-        <h2 className={styles.name}>{usuario.nombre}</h2>
+        <h2 className={styles.name}>{usuario.nombre}{usuario.apellido ?? ""}</h2>
 
         <p className={styles.role}>
           {usuario.rol === "admin"
@@ -177,25 +178,43 @@ export default function PerfilCard() {
           <div className={styles.detailRow}>
             <div className={styles.label}>
               <FaUserCircle />
-              Nombre
+              <span>Nombre</span>
             </div>
 
-            <span>{usuario.nombre}</span>
+            <span className={styles.value}>{usuario.nombre}</span>
+          </div>
+
+          <div className={styles.detailRow}>
+            <div className={styles.label}>
+                <FaUserCircle />
+                <span>Apellido</span>
+            </div>
+
+            <span className={styles.value}>{usuario.apellido || "No registrado"}</span>
           </div>
 
           <div className={styles.detailRow}>
             <div className={styles.label}>
               <FaEnvelope />
-              Correo electrónico
+              <span>Correo electrónico</span>
             </div>
 
-            <span>{usuario.correo}</span>
+            <span className={styles.value}>{usuario.correo}</span>
+          </div>
+
+          <div className={styles.detailRow}>
+            <div className={styles.label}>
+              <FaPhone />
+              <span>Teléfono</span>
+            </div>
+
+            <span className={styles.value}>{usuario.telefono || "No registrado"}</span>
           </div>
 
           <div className={styles.detailRow}>
             <div className={styles.label}>
               <FaShieldAlt />
-              Rol
+              <span>Rol</span>
             </div>
 
             <span>
@@ -208,7 +227,7 @@ export default function PerfilCard() {
           <div className={styles.detailRow}>
             <div className={styles.label}>
               <FaShieldAlt />
-              Estado
+              <span>Estado</span>
             </div>
 
             <span className={styles.activeText}>

@@ -183,26 +183,26 @@
 }
 
 .details {
+  width: 100%;
   border-top: 1px solid #edf0f3;
 }
 
 .detailRow {
   display: grid;
-  grid-template-columns: 230px 1fr;
-
+  grid-template-columns: 280px 1fr;
   align-items: center;
 
-  padding: 17px 4px;
+  min-height: 70px;
+
+  padding: 0 4px;
 
   border-bottom: 1px solid #edf0f3;
-
-  color: #1f2937;
 }
 
 .label {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 
   color: #64748b;
   font-size: 14px;
@@ -210,21 +210,36 @@
 }
 
 .label svg {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+
   color: #94a3b8;
+}
+
+.value {
+  display: block;
+
+  color: #111827;
+  font-size: 15px;
+  font-weight: 400;
 }
 
 .activeText {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 
-  color: #237a45;
+  color: #169447;
+  font-size: 15px;
   font-weight: 600;
 }
 
 .smallDot {
   width: 8px;
   height: 8px;
+
+  flex-shrink: 0;
 
   border-radius: 50%;
   background: #22c55e;
@@ -326,7 +341,12 @@
 
   .detailRow {
     grid-template-columns: 1fr;
-    gap: 7px;
+    gap: 8px;
+  }
+
+  .value,
+  .activeText {
+    padding-left: 30px;
   }
 
   .security,

@@ -104,7 +104,9 @@ export default function EditarPerfilPage() {
 
       actualizarUsuarioSesion({
         nombre: nombre.trim(),
+        apellido: apellido.trim(),
         correo: correo.trim(),
+        telefono: telefono.trim(),
       });
 
       setExito("La información se actualizó correctamente.");
