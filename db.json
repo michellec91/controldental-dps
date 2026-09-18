@@ -1,5 +1,52 @@
 {
-  "usuarios": [],
-  "tratamientos": [],
-  "citas": []
+  "usuarios": [
+    {
+      "id": "1",
+      "nombre": "Silvia Raquel",
+      "correo": "admin@controldental.com",
+      "contrasena": "Admin1234",
+      "rol": "admin",
+      "estado": "activo",
+      "imagenPerfil": "https://utfs.io/f/6S2qMV8niaj7CT7AqxIjL54tNdhGgqZSmVXKrzMoAJWawQs1",
+      "apellido": "Pérez Barriere",
+      "telefono": "76065682",
+      "direccion": "San Salvador"
+    },
+    {
+      "id": "2",
+      "nombre": "Paciente Prueba",
+      "correo": "paciente@controldental.com",
+      "contrasena": "Paciente123",
+      "rol": "paciente",
+      "estado": "activo"
+    },
+    {
+      "id": "3",
+      "nombre": "Administrador Inactivo",
+      "correo": "inactivo@controldental.com",
+      "contrasena": "Inactivo123",
+      "rol": "admin",
+      "estado": "inactivo"
+    }
+  ],
+  "tratamientos": [
+    {
+      "name": "Odontología preventiva",
+      "content": "Limpiezas dentales profesionales (tartrectomías), aplicación de flúor y selladores para evitar caries.",
+      "cost": "45",
+      "duration": "30 min - 45 min",
+      "image": "https://utfs.io/f/6S2qMV8niaj7LR6hq5w1sT8GfWAaz3gnqv4UmNdt6DryMb7I",
+      "id": "1"
+    },
+    {
+      "name": "Ortodoncia",
+      "content": "Uso de brackets o alineadores transparentes para corregir la posición de los dientes y la mordida.",
+      "cost": "50",
+      "duration": "50 min - 1 h",
+      "image": "https://utfs.io/f/6S2qMV8niaj79NqtwqhmOSP36WLi1trhNQDBY50cEsFqCMTn",
+      "id": "2"
+    }
+  ],
+  "citas": [],
+  "$schema": "./node_modules/json-server/schema.json"
 }
