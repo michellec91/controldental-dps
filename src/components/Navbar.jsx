@@ -1,14 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { FaHome, FaTooth, FaCalendarAlt, FaUserCircle, FaSignOutAlt, FaLock, FaUser } from "react-icons/fa"
+import { useAuth } from "../context/AuthContext"
 
 export default function Navbar() {
     const [open, setOpen] = useState(false)
     const menuRef = useRef(null)
     const pathname = usePathname()
+    const { usuario, cerrarSesion } = useAuth()
+    const router = useRouter()
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -39,6 +42,12 @@ export default function Navbar() {
                 ? 'bg-blue-50 text-blue-600'
                 : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
         }`
+    }
+
+    const handleCerrarSesion = () => {
+        cerrarSesion()
+        setOpen(false)
+        router.replace("/login")
     }
 
     return (
@@ -75,7 +84,16 @@ export default function Navbar() {
                                 aria-label="Cuenta"
                                 aria-expanded={open}
                             >
+                                {usuario?.imagenPerfil ? (
+                                    <span
+                                    className="block w-8 h-8 rounded-full bg-cover bg-center bg-no-repeat"
+                                    style={{
+                                        backgroundImage: `url("${usuario.imagenPerfil}")`,
+                                    }}
+                                />
+                            ) : (
                                 <FaUserCircle size={24} />
+                            )}
                             </button>
 
                             {open && (
@@ -90,10 +108,12 @@ export default function Navbar() {
 
                                         <div className="px-4 py-3 border-b border-gray-100">
                                             <p className="text-sm font-semibold text-gray-800 truncate">
-                                                Alejandra Fernández
+                                                {usuario?.nombre ?? "Administrador"}
                                             </p>
                                             <p className="text-xs text-gray-500">
-                                                Administrador
+                                                {usuario?.rol === "admin"
+                                                ? "Administrador"
+                                                : usuario?.rol}
                                             </p>
                                         </div>
 
@@ -121,9 +141,7 @@ export default function Navbar() {
                                             <button
                                                 type="button"
                                                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
-                                                onClick={() => {
-                                                    setOpen(false)
-                                                }}
+                                                onClick={handleCerrarSesion}                                                
                                             >
                                                 <FaSignOutAlt size={14} />
                                                 <span>Cerrar Sesión</span>

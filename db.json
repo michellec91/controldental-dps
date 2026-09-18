@@ -6,7 +6,8 @@
       "correo": "admin@controldental.com",
       "contrasena": "Admin1234",
       "rol": "admin",
-      "estado": "activo"
+      "estado": "activo",
+      "imagenPerfil": "https://utfs.io/f/6S2qMV8niaj7CT7AqxIjL54tNdhGgqZSmVXKrzMoAJWawQs1"
     },
     {
       "id": "2",
