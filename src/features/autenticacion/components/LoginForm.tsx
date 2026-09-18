@@ -52,6 +52,7 @@ export default function LoginForm() {
         correo: usuario.correo,
         rol: usuario.rol,
         estado: usuario.estado,
+        imagenPerfil: usuario.imagenPerfil,
       });
 
       // Temporal mientras Silvia desarrolla el dashboard.
