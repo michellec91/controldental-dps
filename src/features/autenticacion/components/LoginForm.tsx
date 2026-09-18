@@ -54,9 +54,8 @@ export default function LoginForm() {
         estado: usuario.estado,
         imagenPerfil: usuario.imagenPerfil,
       });
-
-      // Temporal mientras Silvia desarrolla el dashboard.
-      router.push("/");
+      
+      router.push("/admin-prueba");
     } catch {
       setError(
         "No fue posible conectar con el servidor. Verifica que la API esté activa."

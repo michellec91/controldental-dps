@@ -46,7 +46,7 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
 
-                    <Link href="/" className="flex items-center gap-2 shrink-0">
+                    <Link href="/admin-prueba" className="flex items-center gap-2 shrink-0">
                         <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
                             <FaTooth size={18} />
                         </span>
@@ -56,7 +56,7 @@ export default function Navbar() {
                     </Link>
 
                     <div className="flex items-center gap-1 sm:gap-2">
-                        <Link href="/" title="Inicio" aria-label="Inicio" className={linkClass('/')}>
+                        <Link href="/admin-prueba" title="Inicio" aria-label="Inicio" className={linkClass('/admin-prueba')}>
                             <FaHome size={18} />
                         </Link>
                         <Link href="/tratamientos" title="Tratamientos" aria-label="Tratamientos" className={linkClass('/tratamientos')}>
