@@ -1,14 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { FaHome, FaTooth, FaCalendarAlt, FaUserCircle, FaSignOutAlt, FaLock, FaUser } from "react-icons/fa"
+import { useAuth } from "../context/AuthContext"
 
 export default function Navbar() {
     const [open, setOpen] = useState(false)
     const menuRef = useRef(null)
     const pathname = usePathname()
+    const { usuario, cerrarSesion } = useAuth()
+    const router = useRouter()
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -41,12 +44,18 @@ export default function Navbar() {
         }`
     }
 
+    const handleCerrarSesion = () => {
+        cerrarSesion()
+        setOpen(false)
+        router.replace("/login")
+    }
+
     return (
         <nav className="w-full bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
 
-                    <Link href="/" className="flex items-center gap-2 shrink-0">
+                    <Link href="/admin-prueba" className="flex items-center gap-2 shrink-0">
                         <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
                             <FaTooth size={18} />
                         </span>
@@ -56,7 +65,7 @@ export default function Navbar() {
                     </Link>
 
                     <div className="flex items-center gap-1 sm:gap-2">
-                        <Link href="/" title="Inicio" aria-label="Inicio" className={linkClass('/')}>
+                        <Link href="/admin-prueba" title="Inicio" aria-label="Inicio" className={linkClass('/admin-prueba')}>
                             <FaHome size={18} />
                         </Link>
                         <Link href="/tratamientos" title="Tratamientos" aria-label="Tratamientos" className={linkClass('/tratamientos')}>
@@ -75,7 +84,16 @@ export default function Navbar() {
                                 aria-label="Cuenta"
                                 aria-expanded={open}
                             >
+                                {usuario?.imagenPerfil ? (
+                                    <span
+                                    className="block w-8 h-8 rounded-full bg-cover bg-center bg-no-repeat"
+                                    style={{
+                                        backgroundImage: `url("${usuario.imagenPerfil}")`,
+                                    }}
+                                />
+                            ) : (
                                 <FaUserCircle size={24} />
+                            )}
                             </button>
 
                             {open && (
@@ -90,10 +108,12 @@ export default function Navbar() {
 
                                         <div className="px-4 py-3 border-b border-gray-100">
                                             <p className="text-sm font-semibold text-gray-800 truncate">
-                                                Alejandra Fernández
+                                                {usuario?.nombre ?? "Administrador"}
                                             </p>
                                             <p className="text-xs text-gray-500">
-                                                Administrador
+                                                {usuario?.rol === "admin"
+                                                ? "Administrador"
+                                                : usuario?.rol}
                                             </p>
                                         </div>
 
@@ -108,7 +128,7 @@ export default function Navbar() {
                                             </Link>
 
                                             <Link
-                                                href="/cambiar-password"
+                                                href="/perfil/cambiar-password"
                                                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                                 onClick={() => setOpen(false)}
                                             >
@@ -121,9 +141,7 @@ export default function Navbar() {
                                             <button
                                                 type="button"
                                                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
-                                                onClick={() => {
-                                                    setOpen(false)
-                                                }}
+                                                onClick={handleCerrarSesion}                                                
                                             >
                                                 <FaSignOutAlt size={14} />
                                                 <span>Cerrar Sesión</span>
