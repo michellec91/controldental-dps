@@ -5,6 +5,8 @@ export interface Cita {
   tratamiento: string;
   fecha: string;
   hora: string;
+  correo: string;
+  telefono: string;
   estado: string;
 }
 
