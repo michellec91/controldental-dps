@@ -1,87 +1,107 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Cita } from "../../agenda/types/agenda.types";
 
 interface FormAgendarCitaProps {
-  todasLasCitas: Cita[];
-  onCitaCreada: (nuevaCita: Cita) => void;
+  onCitaCreada?: (cita: Cita) => void;
 }
 
-export function FormAgendarCita({ todasLasCitas, onCitaCreada }: FormAgendarCitaProps) {
+export function FormAgendarCita({ onCitaCreada }: FormAgendarCitaProps) {
   const [pacienteNombre, setPacienteNombre] = useState("");
   const [tratamientoNombre, setTratamientoNombre] = useState("Limpieza Dental");
   const [fecha, setFecha] = useState("");
-  const [hora, setHora] = useState("8:00 AM");
-  const [error, setError] = useState("");
-  const [exito, setExito] = useState("");
+  const [hora, setHora] = useState("08:00 AM");
+  const [errorNombre, setErrorNombre] = useState("");
+  const [errorGeneral, setErrorGeneral] = useState("");
+  const [citasExistentes, setCitasExistentes] = useState<Cita[]>([]);
 
-  // Formato YYYY-MM-DD para el atributo 'min' del input tipo date
-  const hoyString = new Date().toISOString().split("T")[0];
+  // Formato YYYY-MM-DD para la fecha mínima
+  const hoy = new Date();
+  const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
 
-  const horasDisponibles = [
-    "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 M",
-    "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
-  ];
+  // Cargar citas existentes para comprobar duplicados
+  useEffect(() => {
+    fetch("http://localhost:3001/citas")
+      .then((res) => res.json())
+      .then((data) => setCitasExistentes(data))
+      .catch((err) => console.error("Error al obtener citas:", err));
+  }, []);
+
+  const normalizarHora = (h: string) =>
+    h.trim().toUpperCase().replace(/^0/, "");
+
+  const handleNombreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = e.target.value;
+    const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
+
+    if (!regexSoloLetras.test(valor)) {
+      setErrorNombre("El nombre solo puede contener letras y espacios.");
+    } else {
+      setErrorNombre("");
+    }
+    setPacienteNombre(valor);
+    setErrorGeneral("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setExito("");
+    setErrorGeneral("");
 
-    const nombreLimpio = pacienteNombre.trim();
-
-    if (!nombreLimpio || !fecha) {
-      setError("Por favor completa todos los campos requeridos.");
-      return;
-    }
-
-    // 1. Validar que el nombre solo contenga letras, espacios, tildes y 'ñ'
+    // 1. Validar nombre solo letras
     const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-    if (!regexSoloLetras.test(nombreLimpio)) {
-      setError("El nombre solo debe contener letras y espacios (sin números ni símbolos).");
+    if (!pacienteNombre.trim() || !regexSoloLetras.test(pacienteNombre.trim())) {
+      setErrorNombre("El nombre solo puede contener letras y espacios.");
       return;
     }
 
-    // 2. Validar que la fecha no sea en el pasado
-    const fechaSeleccionada = new Date(fecha + "T00:00:00");
-    const hoySinHora = new Date();
-    hoySinHora.setHours(0, 0, 0, 0);
-
-    if (fechaSeleccionada < hoySinHora) {
-      setError("No puedes seleccionar una fecha que ya transcurrió.");
+    // 2. Validar fecha seleccionada
+    if (!fecha) {
+      setErrorGeneral("Por favor seleccione una fecha.");
       return;
     }
 
-    // 3. Validar Domingo
-    if (fechaSeleccionada.getDay() === 0) {
-      setError("La clínica no atiende los domingos. Elige otra fecha.");
+    // 3. Validar que no sea fecha anterior a la actual
+    if (fecha < hoyStr) {
+      setErrorGeneral("No se pueden agendar citas en fechas pasadas.");
       return;
     }
 
-    // 4. Validar Sábado por la tarde
-    if (
-      fechaSeleccionada.getDay() === 6 &&
-      ["1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"].includes(hora)
-    ) {
-      setError("Los sábados atendemos únicamente de 8:00 AM a 12:00 M.");
+    // Parsear fecha seleccionada (evitando desfasaje UTC)
+    const [year, month, day] = fecha.split("-").map(Number);
+    const fechaObj = new Date(year, month - 1, day);
+    const diaSemana = fechaObj.getDay(); // 0 = Domingo, 6 = Sábado
+
+    // 4. Validar Domingo
+    if (diaSemana === 0) {
+      setErrorGeneral("La clínica no atiende los días domingo.");
       return;
     }
 
-    // 5. Validar si el horario ya está ocupado en la BD
-    const estaOcupado = todasLasCitas.some(
-      (c) => c.fecha === fecha && c.hora === hora && c.estado !== "cancelada"
-    );
-
-    if (estaOcupado) {
-      setError(
-        `⚠️ El horario de las ${hora} el día ${fecha} ya está ocupado. Por favor elige otro horario o fecha.`
-      );
+    // 5. Validar Sábado por la tarde (Solo 8:00 AM a 12:00 M)
+    const horasTardeSabado = ["01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
+    if (diaSemana === 6 && horasTardeSabado.includes(hora)) {
+      setErrorGeneral("Los sábados la clínica solo atiende de 8:00 AM a 12:00 M.");
       return;
     }
 
-    const nuevaCitaObj: Omit<Cita, "id"> = {
-      pacienteNombre: nombreLimpio,
+    // 6. Validar citas duplicadas en la misma fecha y hora (no canceladas)
+    const ocupado = citasExistentes.some((c) => {
+      const fechaCita = c.fecha.split("T")[0].trim();
+      const esMismaFecha = fechaCita === fecha.trim();
+      const esMismaHora = normalizarHora(c.hora) === normalizarHora(hora);
+      const estaActiva = c.estado !== "cancelada";
+
+      return esMismaFecha && esMismaHora && estaActiva;
+    });
+
+    if (ocupado) {
+      setErrorGeneral("Ya existe una cita agendada para ese día y esa hora.");
+      return;
+    }
+
+    const nuevaCita = {
+      pacienteNombre: pacienteNombre.trim(),
       tratamientoNombre,
       fecha,
       hora,
@@ -92,103 +112,112 @@ export function FormAgendarCita({ todasLasCitas, onCitaCreada }: FormAgendarCita
       const res = await fetch("http://localhost:3001/citas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevaCitaObj),
+        body: JSON.stringify(nuevaCita),
       });
 
       if (res.ok) {
         const data = await res.json();
-        onCitaCreada(data);
-        setExito("¡Cita agendada con éxito!");
         setPacienteNombre("");
         setFecha("");
-      } else {
-        setError("Error al registrar la cita.");
+        setErrorNombre("");
+        setErrorGeneral("");
+        if (onCitaCreada) onCitaCreada(data);
       }
     } catch (err) {
-      console.error(err);
-      setError("Error de conexión con el servidor.");
+      setErrorGeneral("Error al conectar con el servidor.");
     }
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-      <h2 className="text-xl font-bold text-gray-800">Agendar Nueva Cita</h2>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-xs font-bold text-gray-700 mb-1">
+          Nombre del Paciente
+        </label>
+        <input
+          type="text"
+          value={pacienteNombre}
+          onChange={handleNombreChange}
+          placeholder="Ej. Juan Pérez"
+          className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none"
+        />
+        {errorNombre && (
+          <p className="mt-1 text-xs text-red-500 font-semibold">{errorNombre}</p>
+        )}
+      </div>
 
-      {error && (
-        <div className="rounded-xl bg-red-100 p-3 text-xs font-semibold text-red-700 border border-red-300">
-          {error}
-        </div>
-      )}
+      <div>
+        <label className="block text-xs font-bold text-gray-700 mb-1">
+          Tratamiento
+        </label>
+        <select
+          value={tratamientoNombre}
+          onChange={(e) => setTratamientoNombre(e.target.value)}
+          className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white"
+        >
+          <option value="Limpieza Dental">Limpieza Dental</option>
+          <option value="Rellenos">Rellenos</option>
+          <option value="Extracción">Extracción</option>
+          <option value="Ortodoncia">Ortodoncia</option>
+        </select>
+      </div>
 
-      {exito && (
-        <div className="rounded-xl bg-green-100 p-3 text-xs font-semibold text-green-700 border border-green-300">
-          {exito}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">Nombre del Paciente</label>
+          <label className="block text-xs font-bold text-gray-700 mb-1">
+            Fecha
+          </label>
           <input
-            type="text"
-            placeholder="Ej. Juan Pérez"
-            value={pacienteNombre}
-            onChange={(e) => setPacienteNombre(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-            required
+            type="date"
+            min={hoyStr}
+            value={fecha}
+            onChange={(e) => {
+              setFecha(e.target.value);
+              setErrorGeneral("");
+            }}
+            className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">Tratamiento</label>
+          <label className="block text-xs font-bold text-gray-700 mb-1">
+            Hora
+          </label>
           <select
-            value={tratamientoNombre}
-            onChange={(e) => setTratamientoNombre(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            value={hora}
+            onChange={(e) => {
+              setHora(e.target.value);
+              setErrorGeneral("");
+            }}
+            className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white"
           >
-            <option value="Limpieza Dental">Limpieza Dental</option>
-            <option value="Rellenos">Rellenos</option>
-            <option value="Ortodoncia">Ortodoncia</option>
-            <option value="Extracción">Extracción</option>
+            <option value="08:00 AM">08:00 AM</option>
+            <option value="09:00 AM">09:00 AM</option>
+            <option value="10:00 AM">10:00 AM</option>
+            <option value="11:00 AM">11:00 AM</option>
+            <option value="12:00 M">12:00 M</option>
+            <option value="01:00 PM">01:00 PM</option>
+            <option value="02:00 PM">02:00 PM</option>
+            <option value="03:00 PM">03:00 PM</option>
+            <option value="04:00 PM">04:00 PM</option>
+            <option value="05:00 PM">05:00 PM</option>
           </select>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Fecha</label>
-            <input
-              type="date"
-              min={hoyString}
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              className="w-full rounded-xl border border-gray-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Hora</label>
-            <select
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
-              className="w-full rounded-xl border border-gray-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {horasDisponibles.map((h) => (
-                <option key={h} value={h}>
-                  {h}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* MENSAJE DE ERROR DENTRO DE LA WEB (Sin alert del navegador) */}
+      {errorGeneral && (
+        <div className="rounded-lg bg-red-50 p-2.5 text-xs font-semibold text-red-600 border border-red-200">
+          ⚠️ {errorGeneral}
         </div>
+      )}
 
-        <button
-          type="submit"
-          className="w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow hover:bg-blue-700 transition-colors"
-        >
-          Confirmar y Agendar Cita
-        </button>
-      </form>
-    </div>
+      <button
+        type="submit"
+        className="w-full rounded-xl bg-blue-600 py-3 text-xs font-bold text-white hover:bg-blue-700 transition-colors"
+      >
+        Confirmar y Agendar Cita
+      </button>
+    </form>
   );
 }

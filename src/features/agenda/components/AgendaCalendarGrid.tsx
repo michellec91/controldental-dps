@@ -26,13 +26,21 @@ export function AgendaCalendarGrid({
     "5:00 PM",
   ];
 
-  const diasNombres = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"];
+  const diasNombres = [
+    "LUNES",
+    "MARTES",
+    "MIÉRCOLES",
+    "JUEVES",
+    "VIERNES",
+    "SÁBADO",
+    "DOMINGO",
+  ];
 
   const diasSemana = diasNombres.map((nombre, idx) => {
     const d = new Date(semanaInicio);
     d.setDate(semanaInicio.getDate() + idx);
 
-    // Formatear en hora local YYYY-MM-DD sin desfase de zona horaria (sin toISOString)
+    // Formatear en hora local YYYY-MM-DD sin desfase de zona horaria
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
@@ -45,14 +53,42 @@ export function AgendaCalendarGrid({
     };
   });
 
+  // Función helper para limpiar la hora y comparar formatos (ej: "09:00 AM" vs "9:00 AM")
+  const horasCoinciden = (horaCita: string, horaSlot: string) => {
+    if (!horaCita) return false;
+
+    // Normaliza eliminando el cero inicial (ej: "09:00 AM" -> "9:00 AM")
+    const limpiar = (str: string) =>
+      str
+        .trim()
+        .toUpperCase()
+        .replace(/^0/, ""); // Quita el 0 del inicio si existe
+
+    const hCita = limpiar(horaCita);
+    const hSlot = limpiar(horaSlot);
+
+    if (hCita === hSlot) return true;
+
+    // Comparación fallback si la cita no guardó AM/PM (ej: "9:00" vs "9:00 AM")
+    const soloHoraCita = hCita.replace(/(AM|PM|M)/g, "").trim();
+    const soloHoraSlot = hSlot.replace(/(AM|PM|M)/g, "").trim();
+
+    return soloHoraCita === soloHoraSlot;
+  };
+
   return (
     <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="grid grid-cols-8 gap-2 min-w-[900px]">
         <div className="p-2 font-bold text-gray-400">Hora</div>
         {diasSemana.map((dia) => (
-          <div key={dia.nombre} className="text-center font-bold text-gray-800 py-2 border-b">
+          <div
+            key={dia.nombre}
+            className="text-center font-bold text-gray-800 py-2 border-b"
+          >
             <div>{dia.nombre}</div>
-            <div className="text-sm font-normal text-gray-500">{dia.numero}</div>
+            <div className="text-sm font-normal text-gray-500">
+              {dia.numero}
+            </div>
           </div>
         ))}
 
@@ -76,7 +112,9 @@ export function AgendaCalendarGrid({
 
               const esSabadoTarde =
                 dia.nombre === "SÁBADO" &&
-                ["1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"].includes(hora);
+                ["1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"].includes(
+                  hora
+                );
 
               if (esSabadoTarde) {
                 return (
@@ -89,9 +127,15 @@ export function AgendaCalendarGrid({
                 );
               }
 
-              const cita = citas.find(
-                (c) => c.fecha === dia.fechaStr && c.hora === hora
-              );
+              // Buscamos la cita extrayendo solo YYYY-MM-DD y comparando horas de forma flexible
+              const cita = citas.find((c) => {
+                if (!c.fecha) return false;
+                const fechaCitaLimpia = c.fecha.split("T")[0].trim();
+                return (
+                  fechaCitaLimpia === dia.fechaStr &&
+                  horasCoinciden(c.hora, hora)
+                );
+              });
 
               if (cita) {
                 const esConfirmada = cita.estado === "confirmada";
@@ -107,7 +151,9 @@ export function AgendaCalendarGrid({
                       🦷 {cita.tratamientoNombre}
                     </div>
                     <div className="flex justify-between items-center text-[10px]">
-                      <span className="uppercase font-extrabold">{cita.estado}</span>
+                      <span className="uppercase font-extrabold">
+                        {cita.estado}
+                      </span>
                       <button
                         onClick={() => onEliminarCita(cita.id)}
                         className="opacity-0 group-hover:opacity-100 bg-black/30 hover:bg-black/60 rounded px-1.5 py-0.5 text-[9px] transition-opacity"

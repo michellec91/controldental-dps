@@ -8,6 +8,7 @@ import { MiniCalendar } from "./components/MiniCalendar";
 
 export default function AgendaView() {
   const [citas, setCitas] = useState<Cita[]>([]);
+  const [fechaSeleccionada, setFechaSeleccionada] = useState<Date>(new Date()); // Fecha seleccionada real (Hoy)
 
   // Función para obtener el lunes de cualquier fecha en hora local
   const getLunesSemana = (fecha: Date) => {
@@ -21,11 +22,16 @@ export default function AgendaView() {
 
   const [semanaInicio, setSemanaInicio] = useState<Date>(() => getLunesSemana(new Date()));
 
-  const cargarCitas = () => {
-    fetch("http://localhost:3001/citas")
-      .then((res) => res.json())
-      .then((data) => setCitas(data))
-      .catch((err) => console.error("Error al obtener citas:", err));
+  const cargarCitas = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/citas");
+      if (res.ok) {
+        const data = await res.json();
+        setCitas(data);
+      }
+    } catch (err) {
+      console.error("Error al obtener citas:", err);
+    }
   };
 
   useEffect(() => {
@@ -47,7 +53,7 @@ export default function AgendaView() {
     }
   };
 
-  // Funciones de Navegación por Semanas
+  // Navegación por Semanas
   const irSemanaAnterior = () => {
     setSemanaInicio((prev) => {
       const nueva = new Date(prev);
@@ -65,12 +71,15 @@ export default function AgendaView() {
   };
 
   const irAHoy = () => {
-    setSemanaInicio(getLunesSemana(new Date()));
+    const hoy = new Date();
+    setFechaSeleccionada(hoy);
+    setSemanaInicio(getLunesSemana(hoy));
+    cargarCitas(); // Recargar citas al presionar "Esta Semana"
   };
 
-  // Permite seleccionar una fecha en el MiniCalendar para ir a esa semana
-  const handleSeleccionarFechaMiniCal = (fechaSeleccionada: Date) => {
-    setSemanaInicio(getLunesSemana(fechaSeleccionada));
+  const handleSeleccionarFechaMiniCal = (fecha: Date) => {
+    setFechaSeleccionada(fecha);
+    setSemanaInicio(getLunesSemana(fecha));
   };
 
   return (
@@ -84,7 +93,7 @@ export default function AgendaView() {
 
             <MiniCalendar
               citas={citas}
-              fechaSeleccionada={semanaInicio}
+              fechaSeleccionada={fechaSeleccionada} // Pasar la fecha seleccionada en vez de semanaInicio
               onSeleccionarFecha={handleSeleccionarFechaMiniCal}
             />
 
@@ -107,7 +116,6 @@ export default function AgendaView() {
 
           {/* Matriz Dinámica para el Administrador */}
           <div className="flex-1 space-y-4">
-            {/* Barra de Control de Navegación de Semanas */}
             <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
               <button
                 onClick={irSemanaAnterior}

@@ -45,20 +45,12 @@
   ],
   "citas": [
     {
-      "pacienteNombre": "Carlos Hernandez",
+      "pacienteNombre": "Pablo torres",
       "tratamientoNombre": "Limpieza Dental",
-      "fecha": "2026-09-26",
-      "hora": "10:00 AM",
-      "estado": "confirmada",
-      "id": "Vba3rMLlI-0"
-    },
-    {
-      "pacienteNombre": "Susana Chevez",
-      "tratamientoNombre": "Rellenos",
       "fecha": "2026-09-21",
-      "hora": "11:00 AM",
-      "estado": "cancelada",
-      "id": "odz31xK4gkM"
+      "hora": "05:00 PM",
+      "estado": "confirmada",
+      "id": "BvjqrfbXhLQ"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
