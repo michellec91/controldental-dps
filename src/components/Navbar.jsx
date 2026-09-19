@@ -71,7 +71,7 @@ export default function Navbar() {
                         <Link href="/tratamientos" title="Tratamientos" aria-label="Tratamientos" className={linkClass('/tratamientos')}>
                             <FaTooth size={18} />
                         </Link>
-                        <Link href="/calendario" title="Calendario" aria-label="Calendario" className={linkClass('/calendario')}>
+                        <Link href="/citas" title="citas" aria-label="citas" className={linkClass('/citas')}>
                             <FaCalendarAlt size={18} />
                         </Link>
 

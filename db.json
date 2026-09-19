@@ -47,6 +47,15 @@
       "id": "2"
     }
   ],
-  "citas": [],
+  "citas": [
+    {
+      "pacienteNombre": "Pablo torres",
+      "tratamientoNombre": "Limpieza Dental",
+      "fecha": "2026-09-21",
+      "hora": "05:00 PM",
+      "estado": "confirmada",
+      "id": "BvjqrfbXhLQ"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }
