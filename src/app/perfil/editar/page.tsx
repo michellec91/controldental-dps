@@ -85,7 +85,7 @@ export default function EditarPerfilPage() {
       setGuardando(true);
 
       const respuestaActual = await fetch(
-        `http://localhost:3001/usuarios/${usuario.id}`,
+        `${API_URL}/usuarios/${usuario.id}`,
       );
           if (!respuestaActual.ok){
             throw new Error();
