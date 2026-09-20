@@ -1,158 +1,133 @@
 # Control Dental
 
-Proyecto desarrollado para la asignatura **Diseño y Programación de Software Multiplataforma (DPS941)**.
+**Control Dental** es una aplicación web administrativa desarrollada para apoyar la gestión de una clínica dental.
 
-## Etapa 2 - Desarrollo Web
+El sistema permite administrar citas, solicitudes, tratamientos, agenda y perfil de usuario, además de consultar información de la clínica mediante un dashboard dinámico.
 
-Esta etapa corresponde al desarrollo de la plataforma web administrativa de **Control Dental**, una solución para apoyar la gestión de citas y tratamientos de la Clínica Dental Sonrisas.
+Proyecto desarrollado para la asignatura **DPS941 – Universidad Don Bosco, Ciclo II 2026**.
 
-## Tecnologías utilizadas
+---
 
-- React
+## Aplicación
+
+### Frontend – Vercel
+
+**Aplicación web:**  
+PEGAR_AQUÍ_LA_URL_DE_VERCEL
+
+### API REST – Render
+
+**API:**  
+https://controldental-dps.onrender.com
+
+Recursos principales:
+
+- `/usuarios`
+- `/tratamientos`
+- `/citas`
+
+---
+
+## Tecnologías
+
 - Next.js
+- React
 - TypeScript
-- Node.js
-- npm
+- JavaScript
+- CSS Modules
 - JSON Server
-- db.json
-- Git
-- GitHub
-
-## Requisitos previos
-
-Antes de ejecutar el proyecto se debe tener instalado:
-
 - Node.js
-- npm
-- Git
-- Visual Studio Code
+- Git y GitHub
+- Vercel
+- Render
 
-## Instalación
+---
 
-Después de clonar el repositorio, ingresar a la carpeta del proyecto y ejecutar:
+## Funcionalidades
+
+- Autenticación y control de acceso.
+- Rutas protegidas.
+- Dashboard administrativo dinámico.
+- Consulta de información por fecha.
+- Gestión de tratamientos.
+- Gestión de solicitudes de citas.
+- Agenda administrativa.
+- Gestión de perfil.
+- Consumo de API REST.
+
+---
+
+## Arquitectura
+
+```text
+Usuario
+   │
+   ▼
+Vercel
+Next.js + React
+   │
+   ▼
+Render
+API REST - JSON Server
+   │
+   ▼
+db.json
+```
+
+El frontend utiliza la variable de entorno:
+
+```env
+NEXT_PUBLIC_API_URL=https://controldental-dps.onrender.com
+```
+
+---
+
+## Ejecución local
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/michellec91/controldental-dps.git
+cd controldental-dps
+```
+
+### 2. Instalar dependencias
 
 ```bash
 npm install
 ```
 
-Este comando instalará las dependencias necesarias definidas en `package.json`.
+### 3. Iniciar la API local
 
-## Ejecutar la aplicación web
+```bash
+npx json-server db.json --port 3001
+```
 
-Para iniciar Next.js:
+### 4. Iniciar la aplicación
+
+En otra terminal:
 
 ```bash
 npm run dev
 ```
 
-La aplicación estará disponible en:
+Aplicación:
 
 ```text
 http://localhost:3000
 ```
 
-La terminal donde se ejecuta este comando debe permanecer abierta mientras se trabaja con la aplicación.
-
-## Ejecutar la API REST
-
-Para iniciar JSON Server, abrir una terminal adicional y ejecutar:
-
-```bash
-npm run api
-```
-
-La API estará disponible en:
+API:
 
 ```text
 http://localhost:3001
 ```
 
-Endpoints principales:
+---
 
-```text
-http://localhost:3001/usuarios
-http://localhost:3001/tratamientos
-http://localhost:3001/citas
-```
+## Control de versiones
 
-Para trabajar con la aplicación y la API al mismo tiempo deben permanecer activos:
-
-```text
-npm run dev   → Next.js / puerto 3000
-npm run api   → JSON Server / puerto 3001
-```
-
-## Estructura principal del proyecto
-
-```text
-src/
-├── app/
-├── components/
-├── context/
-├── features/
-│   ├── autenticacion/
-│   ├── tratamientos/
-│   ├── solicitudes/
-│   ├── agenda/
-│   └── dashboard-perfil/
-├── hooks/
-├── services/
-└── utils/
-```
-
-### Función de las carpetas
-
-- `app`: páginas, rutas y estructura principal de Next.js.
-- `components`: componentes reutilizables de la interfaz.
-- `context`: manejo de estado global mediante Context API.
-- `features`: módulos funcionales asignados a cada integrante.
-- `hooks`: hooks personalizados de React.
-- `services`: funciones relacionadas con la comunicación con la API REST.
-- `utils`: funciones auxiliares y validaciones reutilizables.
-
-## División del equipo
-
-| Integrante | Módulo | Rama |
-|---|---|---|
-| Sara | Autenticación y control de acceso | `feature/autenticacion` |
-| Andrés | Gestión de tratamientos | `feature/tratamientos` |
-| Jehudi | Solicitudes de citas | `feature/solicitudes` |
-| Francisco | Agenda administrativa | `feature/agenda` |
-| Silvia | Dashboard y perfil | `feature/dashboard-perfil` |
-
-## Flujo de trabajo con Git
-
-Todos los integrantes trabajarán sobre el mismo repositorio.
-
-Después de aceptar la invitación como colaborador, cada integrante debe clonar el repositorio:
-
-```bash
-git clone https://github.com/michellec91/controldental-dps.git
-```
-
-Después debe ingresar a la carpeta del proyecto:
-
-```bash
-cd controldental-dps
-```
-
-Instalar las dependencias:
-
-```bash
-npm install
-```
-
-### Crear la rama asignada
-
-Cada integrante debe crear únicamente la rama correspondiente a su módulo.
-
-Ejemplo para autenticación:
-
-```bash
-git checkout -b feature/autenticacion
-```
-
-Las ramas asignadas son:
+El proyecto utilizó ramas independientes para el desarrollo de los diferentes módulos.
 
 ```text
 feature/autenticacion
@@ -162,97 +137,41 @@ feature/agenda
 feature/dashboard-perfil
 ```
 
-Para comprobar en qué rama se está trabajando:
+Los cambios fueron integrados primero en:
 
-```bash
-git branch
+```text
+testing
 ```
 
-La rama activa aparecerá marcada con `*`.
-
-## Guardar y subir cambios
-
-Después de realizar cambios:
-
-```bash
-git add .
-```
-
-Crear un commit descriptivo:
-
-```bash
-git commit -m "Descripción del cambio realizado"
-```
-
-La primera vez que se suba una rama a GitHub:
-
-```bash
-git push -u origin nombre-de-la-rama
-```
-
-Ejemplo:
-
-```bash
-git push -u origin feature/autenticacion
-```
-
-Después de establecer la conexión de la rama, los siguientes cambios podrán subirse con:
-
-```bash
-git push
-```
-
-## Importante
-
-No se debe desarrollar directamente sobre la rama:
+y posteriormente en:
 
 ```text
 main
 ```
 
-Cada integrante debe trabajar únicamente en su rama asignada.
+La rama `main` contiene la versión utilizada actualmente para producción.
 
-Los cambios serán integrados posteriormente a `main` después de ser revisados y probados.
+---
 
-## Base de datos de prueba
+## Despliegue
 
-Durante la Etapa 2 se utilizará `db.json` como base de datos de prueba y JSON Server como API REST.
+- **Frontend:** Vercel
+- **API REST:** Render
+- **Repositorio:** GitHub
 
-Actualmente contiene las colecciones:
+La aplicación desplegada puede utilizarse sin necesidad de ejecutar el proyecto localmente.
 
-```json
-{
-  "usuarios": [],
-  "tratamientos": [],
-  "citas": []
-}
-```
+---
 
-### Uso de las colecciones
+## Repositorio
 
-- `usuarios`: autenticación, roles y perfiles.
-- `tratamientos`: información de los tratamientos odontológicos.
-- `citas`: solicitudes, agenda y estados de las citas.
+https://github.com/michellec91/controldental-dps
 
-Las solicitudes de citas se manejarán dentro de `citas` mediante estados como:
-
-```text
-pendiente
-confirmada
-rechazada
-cancelada
-```
-
-## Puertos utilizados
-
-| Servicio | Puerto |
-|---|---:|
-| Next.js | 3000 |
-| JSON Server | 3001 |
+---
 
 ## Proyecto académico
 
+**Control Dental**  
+**DPS941**  
 **Universidad Don Bosco**  
-Diseño y Programación de Software Multiplataforma - DPS941  
-Grupo C - Nova Tech  
-Proyecto: **Control Dental**
+**Ciclo II – 2026**
