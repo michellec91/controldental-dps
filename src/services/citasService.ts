@@ -1,8 +1,8 @@
 // Define la estructura que tendrá cada cita.
 export interface Cita {
   id: string;
-  paciente: string;
-  tratamiento: string;
+  pacienteNombre: string;
+  tratamientoNombre: string;
   fecha: string;
   hora: string;
   correo: string;

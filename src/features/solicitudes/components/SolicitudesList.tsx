@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-    Cita,
-    obtenerCitas,
-    actualizarEstadoCita,
-} from "../../../services/citasService";
+import { Cita, obtenerCitas, actualizarEstadoCita } from "../../../services/citasService";
 import Navbar from "../../../components/Navbar";
 import { alertConfirm, alertSuccess } from "../../../lib/alert";
 
@@ -180,7 +176,7 @@ export default function SolicitudesList() {
                                             Paciente
                                         </p>
                                         <p className="text-sm text-gray-900">
-                                            {cita.paciente}
+                                            {cita.pacienteNombre}
                                         </p>
                                     </div>
 
@@ -189,7 +185,7 @@ export default function SolicitudesList() {
                                             Tratamiento
                                         </p>
                                         <p className="text-sm text-gray-900">
-                                            {cita.tratamiento}
+                                            {cita.tratamientoNombre}
                                         </p>
                                     </div>
 
@@ -233,14 +229,18 @@ export default function SolicitudesList() {
                                     {cita.estado === "pendiente" && (
                                         <div className="flex gap-2 mt-6">
                                             <button
-                                                onClick={() => confirmarCita(cita.id)}
+                                                onClick={() =>
+                                                    confirmarCita(cita.id)
+                                                }
                                                 className="px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition-colors"
                                             >
                                                 Confirmar
                                             </button>
 
                                             <button
-                                                onClick={() => rechazarCita(cita.id)}
+                                                onClick={() =>
+                                                    rechazarCita(cita.id)
+                                                }
                                                 className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
                                             >
                                                 Rechazar
