@@ -55,7 +55,7 @@ export default function LoginForm() {
         imagenPerfil: usuario.imagenPerfil,
       });
       
-      router.push("/admin-prueba");
+      router.push("/dashboard");
     } catch {
       setError(
         "No fue posible conectar con el servidor. Verifica que la API esté activa."

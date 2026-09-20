@@ -29,7 +29,7 @@ interface Cita {
 
 const API_URL = "http://localhost:3001";
 
-export default function AdminPruebaPage() {
+export default function DashboardPage() {
   const { usuario } = useAuth();
 
   const [citas, setCitas] = useState<Cita[]>([]);

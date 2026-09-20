@@ -13,7 +13,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!cargando && usuario) {
-      router.replace("/admin-prueba");
+      router.replace("/dashboard");
     }
   }, [usuario, cargando, router]);
 
