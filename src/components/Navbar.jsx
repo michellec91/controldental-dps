@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import { FaHome, FaTooth, FaCalendarAlt, FaUserCircle, FaSignOutAlt, FaLock, FaUser } from "react-icons/fa"
+import { FaHome, FaTooth, FaCalendarAlt, FaClipboardList, FaUserCircle, FaSignOutAlt, FaLock, FaUser } from "react-icons/fa"
 import { useAuth } from "../context/AuthContext"
 
 export default function Navbar() {
@@ -74,7 +74,6 @@ export default function Navbar() {
                         <Link href="/citas" title="citas" aria-label="citas" className={linkClass('/citas')}>
                             <FaCalendarAlt size={18} />
                         </Link>
-
                         <div className="relative ml-1 sm:ml-2" ref={menuRef}>
                             <button
                                 type="button"
