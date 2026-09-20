@@ -11,14 +11,22 @@ import {
 interface UsuarioSesion {
   id: string;
   nombre: string;
+  apellido?: string,
   correo: string;
+  telefono?: string,
   rol: string;
   estado: string;
+  imagenPerfil?: string;
 }
 
 interface AuthContextType {
   usuario: UsuarioSesion | null;
   iniciarSesion: (usuario: UsuarioSesion) => void;
+
+  actualizarUsuarioSesion: (
+    datos: Partial<UsuarioSesion>
+  ) => void;
+
   cerrarSesion: () => void;
   cargando: boolean;
 }
@@ -53,6 +61,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("usuario", JSON.stringify(usuario));
   }
 
+  function actualizarUsuarioSesion(
+    datos: Partial<UsuarioSesion>
+  ) {
+    setUsuario((usuarioActual) => {
+      if (!usuarioActual) {
+        return usuarioActual;
+      }
+    
+      const usuarioActualizado = {
+        ...usuarioActual,
+        ...datos,
+      };
+      
+      localStorage.setItem(
+        "usuario",
+        JSON.stringify(usuarioActualizado)
+      );
+      
+      return usuarioActualizado;
+    });
+  }
+
   function cerrarSesion() {
     setUsuario(null);
     localStorage.removeItem("usuario");
@@ -63,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         usuario,
         iniciarSesion,
+        actualizarUsuarioSesion,
         cerrarSesion,
         cargando,
       }}
