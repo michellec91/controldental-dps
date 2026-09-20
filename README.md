@@ -13,7 +13,7 @@ Proyecto desarrollado para la asignatura **DPS941 – Universidad Don Bosco, Cic
 ### Frontend – Vercel
 
 **Aplicación web:**  
-PEGAR_AQUÍ_LA_URL_DE_VERCEL
+https://controldental-dps.vercel.app/login
 
 ### API REST – Render
 
