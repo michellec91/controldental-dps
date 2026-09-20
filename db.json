@@ -1,30 +1,30 @@
 {
   "usuarios": [
-  {
-    "id": "1",
-    "nombre": "Administrador",
-    "correo": "admin@controldental.com",
-    "contrasena": "Admin123",
-    "rol": "admin",
-    "estado": "activo"
-  },
-  {
-    "id": "2",
-    "nombre": "Paciente Prueba",
-    "correo": "paciente@controldental.com",
-    "contrasena": "Paciente123",
-    "rol": "paciente",
-    "estado": "activo"
-  },
-  {
-    "id": "3",
-    "nombre": "Administrador Inactivo",
-    "correo": "inactivo@controldental.com",
-    "contrasena": "Inactivo123",
-    "rol": "admin",
-    "estado": "inactivo"
-  }
-],
+    {
+      "id": "1",
+      "nombre": "Administrador",
+      "correo": "admin@controldental.com",
+      "contrasena": "Admin123",
+      "rol": "admin",
+      "estado": "activo"
+    },
+    {
+      "id": "2",
+      "nombre": "Paciente Prueba",
+      "correo": "paciente@controldental.com",
+      "contrasena": "Paciente123",
+      "rol": "paciente",
+      "estado": "activo"
+    },
+    {
+      "id": "3",
+      "nombre": "Administrador Inactivo",
+      "correo": "inactivo@controldental.com",
+      "contrasena": "Inactivo123",
+      "rol": "admin",
+      "estado": "inactivo"
+    }
+  ],
   "tratamientos": [
     {
       "name": "Odontología preventiva",
@@ -49,7 +49,59 @@
       "paciente": "Paciente Prueba",
       "tratamiento": "Ortodoncia",
       "fecha": "2026-09-22",
-      "hora": "10:00",
+      "hora": "10:00 AM",
+      "correo": "paciente@controldental.com",
+      "telefono": "+503 7000-0000",
+      "estado": "confirmada"
+    },
+    {
+      "id": "2",
+      "paciente": "María López",
+      "tratamiento": "Odontología preventiva",
+      "fecha": "2026-09-23",
+      "hora": "09:00 AM",
+      "correo": "maria.lopez@gmail.com",
+      "telefono": "+503 7111-1111",
+      "estado": "rechazada"
+    },
+    {
+      "id": "3",
+      "paciente": "Carlos Martínez",
+      "tratamiento": "Ortodoncia",
+      "fecha": "2026-09-24",
+      "hora": "11:30 AM",
+      "correo": "carlos.martinez@gmail.com",
+      "telefono": "+503 7222-2222",
+      "estado": "confirmada"
+    },
+    {
+      "id": "4",
+      "paciente": "Ana Rodríguez",
+      "tratamiento": "Odontología preventiva",
+      "fecha": "2026-09-25",
+      "hora": "02:00 PM",
+      "correo": "ana.rodriguez@gmail.com",
+      "telefono": "+503 7333-3333",
+      "estado": "pendiente"
+    },
+    {
+      "id": "5",
+      "paciente": "José Hernández",
+      "tratamiento": "Ortodoncia",
+      "fecha": "2026-09-26",
+      "hora": "01:30 PM",
+      "correo": "jose.hernandez@gmail.com",
+      "telefono": "+503 7444-4444",
+      "estado": "pendiente"
+    },
+    {
+      "id": "6",
+      "paciente": "Laura Martínez",
+      "tratamiento": "Odontología preventiva",
+      "fecha": "2026-09-27",
+      "hora": "03:00 PM",
+      "correo": "laura.martinez@gmail.com",
+      "telefono": "+503 7555-5555",
       "estado": "pendiente"
     }
   ],

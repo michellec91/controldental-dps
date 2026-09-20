@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import { FaHome, FaTooth, FaCalendarAlt, FaUserCircle, FaSignOutAlt, FaLock, FaUser } from "react-icons/fa"
+import { FaHome, FaTooth, FaCalendarAlt, FaClipboardList, FaUserCircle, FaSignOutAlt, FaLock, FaUser } from "react-icons/fa"
 
 export default function Navbar() {
     const [open, setOpen] = useState(false)
@@ -62,10 +62,12 @@ export default function Navbar() {
                         <Link href="/tratamientos" title="Tratamientos" aria-label="Tratamientos" className={linkClass('/tratamientos')}>
                             <FaTooth size={18} />
                         </Link>
+                        <Link href="/solicitudes" title="Solicitudes" aria-label="Solicitudes" className={linkClass('/solicitudes')}>
+                            <FaClipboardList size={18} />
+                        </Link>
                         <Link href="/calendario" title="Calendario" aria-label="Calendario" className={linkClass('/calendario')}>
                             <FaCalendarAlt size={18} />
                         </Link>
-
                         <div className="relative ml-1 sm:ml-2" ref={menuRef}>
                             <button
                                 type="button"
