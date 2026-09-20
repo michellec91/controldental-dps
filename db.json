@@ -1,5 +1,127 @@
 {
-  "usuarios": [],
-  "tratamientos": [],
-  "citas": []
+  "usuarios": [
+    {
+      "id": "1",
+      "nombre": "Silvia Raquel",
+      "correo": "admin@controldental.com",
+      "contrasena": "Admin1234",
+      "rol": "admin",
+      "estado": "activo",
+      "imagenPerfil": "https://utfs.io/f/6S2qMV8niaj7CT7AqxIjL54tNdhGgqZSmVXKrzMoAJWawQs1",
+      "direccion": "San Salvador"
+    },
+    {
+      "id": "2",
+      "nombre": "Paciente Prueba",
+      "correo": "paciente@controldental.com",
+      "contrasena": "Paciente123",
+      "rol": "paciente",
+      "estado": "activo"
+    },
+    {
+      "id": "3",
+      "nombre": "Administrador Inactivo",
+      "correo": "inactivo@controldental.com",
+      "contrasena": "Inactivo123",
+      "rol": "admin",
+      "estado": "inactivo"
+    }
+  ],
+  "tratamientos": [
+    {
+      "name": "Odontología preventiva",
+      "content": "Limpiezas dentales profesionales (tartrectomías), aplicación de flúor y selladores para evitar caries.",
+      "cost": "45",
+      "duration": "30 min - 45 min",
+      "image": "https://utfs.io/f/6S2qMV8niaj7LR6hq5w1sT8GfWAaz3gnqv4UmNdt6DryMb7I",
+      "id": "1"
+    },
+    {
+      "name": "Ortodoncia",
+      "content": "Uso de brackets o alineadores transparentes para corregir la posición de los dientes y la mordida.",
+      "cost": "50",
+      "duration": "50 min - 1 h",
+      "image": "https://utfs.io/f/6S2qMV8niaj79NqtwqhmOSP36WLi1trhNQDBY50cEsFqCMTn",
+      "id": "2"
+    },
+    {
+      "name": "Endodoncia",
+      "content": "Salva un diente dañado o infectado retirando la pulpa enferma del interior de la raíz.",
+      "cost": "75",
+      "duration": "1:30",
+      "image": "https://utfs.io/f/6S2qMV8niaj7uzimcwj98Sp7UK15oBWszQaCVEOew4j3nFHc",
+      "id": "_UEMFRJtwrM"
+    }
+  ],
+  "citas": [
+    {
+      "id": "1",
+      "pacienteNombre": "María López",
+      "tratamientoNombre": "Odontología preventiva",
+      "fecha": "2026-09-23",
+      "hora": "09:00 AM",
+      "correo": "maria.lopez@gmail.com",
+      "telefono": "+503 7111-1111",
+      "estado": "pendiente"
+    },
+    {
+      "id": "2",
+      "pacienteNombre": "Carlos Martínez",
+      "tratamientoNombre": "Ortodoncia",
+      "fecha": "2026-09-24",
+      "hora": "11:30 AM",
+      "correo": "carlos.martinez@gmail.com",
+      "telefono": "+503 7222-2222",
+      "estado": "pendiente"
+    },
+    {
+      "id": "3",
+      "pacienteNombre": "Ana Rodríguez",
+      "tratamientoNombre": "Odontología preventiva",
+      "fecha": "2026-09-25",
+      "hora": "02:00 PM",
+      "correo": "ana.rodriguez@gmail.com",
+      "telefono": "+503 7333-3333",
+      "estado": "pendiente"
+    },
+    {
+      "id": "4",
+      "pacienteNombre": "José Hernández",
+      "tratamientoNombre": "Ortodoncia",
+      "fecha": "2026-09-26",
+      "hora": "01:30 PM",
+      "correo": "jose.hernandez@gmail.com",
+      "telefono": "+503 7444-4444",
+      "estado": "pendiente"
+    },
+    {
+      "id": "5",
+      "pacienteNombre": "Laura Martínez",
+      "tratamientoNombre": "Odontología preventiva",
+      "fecha": "2026-09-27",
+      "hora": "03:00 PM",
+      "correo": "laura.martinez@gmail.com",
+      "telefono": "+503 7555-5555",
+      "estado": "pendiente"
+    },
+    {
+      "id": "6",
+      "pacienteNombre": "Diego Ramírez",
+      "tratamientoNombre": "Ortodoncia",
+      "fecha": "2026-09-28",
+      "hora": "04:00 PM",
+      "correo": "diego.ramirez@gmail.com",
+      "telefono": "+503 7666-6666",
+      "estado": "rechazada"
+    },
+    {
+      "id": "7",
+      "pacienteNombre": "Pablo torres",
+      "tratamientoNombre": "Limpieza Dental",
+      "fecha": "2026-09-21",
+      "hora": "05:00 PM",
+      "estado": "confirmada"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
