@@ -5,6 +5,7 @@ export interface Usuario {
   contrasena: string;
   rol: string;
   estado: string;
+  imagenPerfil?:string;
 }
 
 const API_URL = "http://localhost:3001";
