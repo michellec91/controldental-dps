@@ -71,7 +71,7 @@ export default function Navbar() {
                         <Link href="/tratamientos" title="Tratamientos" aria-label="Tratamientos" className={linkClass('/tratamientos')}>
                             <FaTooth size={18} />
                         </Link>
-                        <Link href="/citas" title="citas" aria-label="citas" className={linkClass('/citas')}>
+                        <Link href="/agenda" title="Agenda" aria-label="Agenda" className={linkClass('/agenda')}>
                             <FaCalendarAlt size={18} />
                         </Link>
                         <div className="relative ml-1 sm:ml-2" ref={menuRef}>

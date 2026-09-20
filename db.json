@@ -107,13 +107,14 @@
       "correo": "diego.ramirez@gmail.com",
       "telefono": "+503 7666-6666",
       "estado": "rechazada"
+    },
+    {
+      "id": "7",
       "pacienteNombre": "Pablo torres",
       "tratamientoNombre": "Limpieza Dental",
       "fecha": "2026-09-21",
       "hora": "05:00 PM",
-      "estado": "confirmada",
-      "id": "BvjqrfbXhLQ"
+      "estado": "confirmada"
     }
-  ],
-  "$schema": "./node_modules/json-server/schema.json"
+  ]
 }
