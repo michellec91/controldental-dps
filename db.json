@@ -45,6 +45,14 @@
       "duration": "50 min - 1 h",
       "image": "https://utfs.io/f/6S2qMV8niaj79NqtwqhmOSP36WLi1trhNQDBY50cEsFqCMTn",
       "id": "2"
+    },
+    {
+      "name": "Endodoncia",
+      "content": "Salva un diente dañado o infectado retirando la pulpa enferma del interior de la raíz.",
+      "cost": "75",
+      "duration": "1:30",
+      "image": "https://utfs.io/f/6S2qMV8niaj7uzimcwj98Sp7UK15oBWszQaCVEOew4j3nFHc",
+      "id": "_UEMFRJtwrM"
     }
   ],
   "citas": [
@@ -116,5 +124,6 @@
       "hora": "05:00 PM",
       "estado": "confirmada"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
