@@ -84,32 +84,62 @@ export default function EditarPerfilPage() {
     try {
       setGuardando(true);
 
+      const respuestaActual = await fetch(
+        `http://localhost:3001/usuarios/${usuario.id}`,
+      );
+          if (!respuestaActual.ok){
+            throw new Error();
+          }
+      
+      const usuarioActualizado = await respuestaActual.json();
+
+      //Actualiza los campos obligatorios
+      usuarioActualizado.nombre = nombre.trim();
+      usuarioActualizado.correo = correo.trim();
+        
+      //Guarda el apellido, elimina si se borra
+      if (apellido.trim()) {
+        usuarioActualizado.apellido = apellido.trim();
+      } else {
+        delete usuarioActualizado.apellido;
+      }
+
+      //Guarda telefono y lo elimina si se borra
+      if(telefono.trim()) {
+        usuarioActualizado.telefono = telefono.trim();
+      } else {
+        delete usuarioActualizado.telefono;
+      }
+
+      //Guarda la direccion y lo elimina si se borra
+      if(direccion.trim()) {
+        usuarioActualizado.direccion = direccion.trim();
+      } else {
+        delete usuarioActualizado.direccion;
+      }
+
+      //Guarda el usuario completo actualizado
       const respuesta = await fetch(
         `${API_URL}/usuarios/${usuario.id}`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            nombre: nombre.trim(),
-            apellido: apellido.trim(),
-            correo: correo.trim(),
-            telefono: telefono.trim(),
-            direccion: direccion.trim(),
-          }),
+          body: JSON.stringify(usuarioActualizado),
         }
       );
 
       if (!respuesta.ok) {
-        throw new Error();
+        throw new Error();        
       }
 
+      //Actualiza también la sesión actual
       actualizarUsuarioSesion({
         nombre: nombre.trim(),
-        apellido: apellido.trim(),
+        apellido: apellido.trim() || undefined,
         correo: correo.trim(),
-        telefono: telefono.trim(),
+        telefono: telefono.trim() || undefined,
       });
 
       setExito("La información se actualizó correctamente.");

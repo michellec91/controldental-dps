@@ -1,12 +1,12 @@
 "use client";
 
+import SelectorFecha from "../../features/dashboard-perfil/components/selectorFecha";
 import { useEffect, useMemo, useState } from "react";
 import {
   FaCalendarDay,
   FaClock,
   FaCheckCircle,
-  FaTimesCircle,
-  FaCalendarAlt,
+  FaTimesCircle,  
 } from "react-icons/fa";
 
 import Navbar from "../../components/Navbar";
@@ -72,13 +72,13 @@ export default function DashboardPage() {
     return () => clearInterval(intervalo);
   }, []);
 
-  const fechaHoy = obtenerFechaLocal();
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(obtenerFechaLocal());
 
   const citasHoy = useMemo(() => {
     return citas.filter((cita) => {
-      return cita.fecha?.startsWith(fechaHoy);
+      return cita.fecha?.startsWith(fechaSeleccionada);
     });
-  }, [citas, fechaHoy]);
+  }, [citas, fechaSeleccionada]);
 
   const pendientes = citasHoy.filter(
     (cita) => normalizarEstado(cita.estado) === "pendiente"
@@ -98,7 +98,7 @@ export default function DashboardPage() {
         if (!cita.fecha) return false;
 
         return (
-          cita.fecha >= fechaHoy &&
+          cita.fecha >= fechaSeleccionada &&
           normalizarEstado(cita.estado) !== "cancelada"
         );
       })
@@ -109,11 +109,11 @@ export default function DashboardPage() {
         return primera.localeCompare(segunda);
       })
       .slice(0, 5);
-  }, [citas, fechaHoy]);
+  }, [citas, fechaSeleccionada]);
 
   const actividadSemanal = useMemo(() => {
-    return obtenerActividadSemanal(citas);
-  }, [citas]);
+    return obtenerActividadSemanal(citas, fechaSeleccionada);
+  }, [citas, fechaSeleccionada]);
 
   return (
     <ProtectedRoute>
@@ -136,20 +136,8 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className={styles.dateBox}>
-              <FaCalendarAlt />
-
-              <div>
-                <span>Fecha actual</span>
-                <strong>
-                  {new Intl.DateTimeFormat("es-SV", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  }).format(new Date())}
-                </strong>
-              </div>
-            </div>
+            < SelectorFecha fecha={fechaSeleccionada} onChange={setFechaSeleccionada}
+            />
           </header>
 
           {error && (
@@ -443,31 +431,34 @@ function formatearFecha(fecha?: string) {
   return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
-function obtenerActividadSemanal(citas: Cita[]) {
+function obtenerActividadSemanal(
+  citas: Cita[],
+  fechaSeleccionada: string
+) {
   const nombres = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
-  const hoy = new Date();
+  const [year, month, day] = fechaSeleccionada
+    .split("-")
+    .map(Number);
 
-  const numeroDia = hoy.getDay();
+  const fechaBase = new Date(year, month - 1, day);
 
+  const numeroDia = fechaBase.getDay();
+
+  // Obtener el lunes de la semana seleccionada
   const diferenciaLunes =
     numeroDia === 0 ? -6 : 1 - numeroDia;
 
-  const lunes = new Date(hoy);
-
+  const lunes = new Date(fechaBase);
+  lunes.setDate(fechaBase.getDate() + diferenciaLunes);
   lunes.setHours(0, 0, 0, 0);
-
-  lunes.setDate(hoy.getDate() + diferenciaLunes);
 
   return nombres.map((nombre, indice) => {
     const fecha = new Date(lunes);
-
     fecha.setDate(lunes.getDate() + indice);
 
     const year = fecha.getFullYear();
-
     const month = String(fecha.getMonth() + 1).padStart(2, "0");
-
     const day = String(fecha.getDate()).padStart(2, "0");
 
     const fechaTexto = `${year}-${month}-${day}`;

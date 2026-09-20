@@ -48,46 +48,6 @@
   font-size: 14px;
 }
 
-.dateBox {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  min-width: 230px;
-
-  padding: 13px 17px;
-
-  background: #ffffff;
-
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-
-  color: #2388e8;
-}
-
-.dateBox > svg {
-  font-size: 19px;
-}
-
-.dateBox div {
-  display: flex;
-  flex-direction: column;
-}
-
-.dateBox span {
-  color: #94a3b8;
-  font-size: 11px;
-}
-
-.dateBox strong {
-  margin-top: 2px;
-
-  color: #334155;
-
-  font-size: 13px;
-  text-transform: capitalize;
-}
-
 .statsGrid {
   display: grid;
 
@@ -499,9 +459,6 @@
     flex-direction: column;
   }
 
-  .dateBox {
-    width: 100%;
-  }
 
   .statsGrid {
     grid-template-columns: 1fr;
