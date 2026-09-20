@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { Cita } from "../../agenda/types/agenda.types";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 interface FormAgendarCitaProps {
   onCitaCreada?: (cita: Cita) => void;
 }
@@ -22,7 +25,7 @@ export function FormAgendarCita({ onCitaCreada }: FormAgendarCitaProps) {
 
   // Cargar citas existentes para comprobar duplicados
   useEffect(() => {
-    fetch("http://localhost:3001/citas")
+    fetch(`${API_URL}/citas`)
       .then((res) => res.json())
       .then((data) => setCitasExistentes(data))
       .catch((err) => console.error("Error al obtener citas:", err));
@@ -109,7 +112,7 @@ export function FormAgendarCita({ onCitaCreada }: FormAgendarCitaProps) {
     };
 
     try {
-      const res = await fetch("http://localhost:3001/citas", {
+      const res = await fetch(`${API_URL}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevaCita),

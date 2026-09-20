@@ -5,6 +5,9 @@ import { alertSuccess, alertError, alertConfirm } from "../../lib/alert.js"
 import { useEffect, useState } from "react"
 import { FaEdit, FaTrash, FaSearch, FaPlus } from "react-icons/fa"
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function Tratamientos() {
     const [tratamientos, setTratamientos] = useState([])
     const [search, setSearch] = useState('')
@@ -16,7 +19,7 @@ export default function Tratamientos() {
 
     const fetchRecords = async () => {
         try {
-            const response = await fetch('http://localhost:3001/tratamientos')
+            const response = await fetch(`${API_URL}/tratamientos`)
             if (!response.ok) throw new Error(`HTTP ${response.status}`)
             const data = await response.json()
             setTratamientos(data)
@@ -59,7 +62,7 @@ export default function Tratamientos() {
                 }
             }
 
-            const response = await fetch(`http://localhost:3001/tratamientos/${id}`, {
+            const response = await fetch(`${API_URL}/tratamientos/${id}`, {
                 method: 'DELETE',
             })
             if (!response.ok) throw new Error(`HTTP ${response.status}`)

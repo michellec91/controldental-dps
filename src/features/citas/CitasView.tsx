@@ -7,6 +7,9 @@ import { ModalAgendarCita } from "./components/ModalAgendarCita";
 import { ModalReprogramarCita } from "./components/ModalReprogramarCita";
 import { Cita } from "../agenda/types/agenda.types";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export function CitasView() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [modalAgendarAbierto, setModalAgendarAbierto] = useState(false);
@@ -15,7 +18,7 @@ export function CitasView() {
 
   const cargarCitas = async () => {
     try {
-      const res = await fetch("http://localhost:3001/citas");
+      const res = await fetch(`${API_URL}/citas`);
       if (res.ok) {
         const data = await res.json();
         setCitas(data);
@@ -37,7 +40,7 @@ export function CitasView() {
     if (!citaACancelar) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/citas/${citaACancelar}`, {
+      const res = await fetch(`${API_URL}/citas/${citaACancelar}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ estado: "cancelada" }),

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { Cita } from "../types/agenda.types";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 interface ModalNuevaCitaProps {
   isOpen: boolean;
   onClose: () => void;
@@ -80,7 +83,7 @@ export function ModalNuevaCita({
     };
 
     try {
-      const res = await fetch("http://localhost:3001/citas", {
+      const res = await fetch(`${API_URL}/citas`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevaCitaObj),

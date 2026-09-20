@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { Cita } from "../../agenda/types/agenda.types";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 interface ModalReprogramarCitaProps {
   cita: Cita | null;
   todasLasCitas: Cita[];
@@ -64,7 +67,7 @@ export function ModalReprogramarCita({
     }
 
     try {
-      const res = await fetch(`http://localhost:3001/citas/${cita.id}`, {
+      const res = await fetch(`${API_URL}/citas/${cita.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

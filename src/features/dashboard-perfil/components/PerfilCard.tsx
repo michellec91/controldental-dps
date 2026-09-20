@@ -17,6 +17,9 @@ import { useAuth } from "../../../context/AuthContext";
 import { useUploadThing } from "../../../lib/uploadthing-client";
 import styles from "./PerfilCard.module.css";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function PerfilCard() {
   const { usuario, cerrarSesion, actualizarUsuarioSesion } = useAuth();
 
@@ -62,7 +65,7 @@ export default function PerfilCard() {
       const nuevaImagen = uploaded[0].url;
 
       const respuesta = await fetch(
-        `http://localhost:3001/usuarios/${usuario.id}`,
+        `${API_URL}/usuarios/${usuario.id}`,
         {
           method: "PATCH",
           headers: {

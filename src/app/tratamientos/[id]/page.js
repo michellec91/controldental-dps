@@ -7,6 +7,9 @@ import { alertSuccess, alertError, alertConfirm } from "../../../lib/alert.js"
 import React, { use, useEffect, useState } from 'react';
 import { FaSave, FaTrash, FaUpload, FaTimes } from "react-icons/fa"
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function EditarTratamiento({ params }) {
     const resolveParams = use(params);
     const id = resolveParams.id;
@@ -30,7 +33,7 @@ export default function EditarTratamiento({ params }) {
 
         const fetchTratamiento = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/tratamientos/${id}`);
+                const response = await fetch(`${API_URL}/tratamientos/${id}`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
                 setName(data.name || '');
@@ -173,7 +176,7 @@ export default function EditarTratamiento({ params }) {
                 setUploading(false);
             }
 
-            const response = await fetch(`http://localhost:3001/tratamientos/${id}`, {
+            const response = await fetch(`${API_URL}/tratamientos/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -240,7 +243,7 @@ export default function EditarTratamiento({ params }) {
                 });
             }
 
-            const response = await fetch(`http://localhost:3001/tratamientos/${id}`, {
+            const response = await fetch(`${API_URL}/tratamientos/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);

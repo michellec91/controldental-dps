@@ -15,6 +15,9 @@ import ProtectedRoute from "../../../features/autenticacion/components/Protected
 import { useAuth } from "../../../context/AuthContext";
 import styles from "./page.module.css";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function CambiarPasswordPage() {
   const { usuario, cerrarSesion } = useAuth();
   const router = useRouter();
@@ -73,7 +76,7 @@ export default function CambiarPasswordPage() {
 
       // Obtener los datos actuales del usuario.
       const respuestaUsuario = await fetch(
-        `http://localhost:3001/usuarios/${usuario.id}`
+        `${API_URL}/usuarios/${usuario.id}`
       );
 
       if (!respuestaUsuario.ok) {
@@ -90,7 +93,7 @@ export default function CambiarPasswordPage() {
 
       // Actualizar únicamente la contraseña.
       const respuestaActualizacion = await fetch(
-        `http://localhost:3001/usuarios/${usuario.id}`,
+        `${API_URL}/usuarios/${usuario.id}`,
         {
           method: "PATCH",
           headers: {

@@ -9,6 +9,9 @@ import ProtectedRoute from "../../../features/autenticacion/components/Protected
 import { useAuth } from "../../../context/AuthContext";
 import styles from "./page.module.css";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 interface DatosUsuario {
   nombre: string;
   apellido?: string;
@@ -39,7 +42,7 @@ export default function EditarPerfilPage() {
   async function cargarDatos() {
     try {
       const respuesta = await fetch(
-        `http://localhost:3001/usuarios/${usuarioActual.id}`
+        `${API_URL}/usuarios/${usuarioActual.id}`
       );
 
       if (!respuesta.ok) {
@@ -82,7 +85,7 @@ export default function EditarPerfilPage() {
       setGuardando(true);
 
       const respuesta = await fetch(
-        `http://localhost:3001/usuarios/${usuario.id}`,
+        `${API_URL}/usuarios/${usuario.id}`,
         {
           method: "PATCH",
           headers: {

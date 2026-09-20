@@ -7,6 +7,9 @@ import Link from "next/link"
 import React, { useState } from 'react'
 import { FaArrowLeft, FaSave, FaUpload, FaTimes } from "react-icons/fa"
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 const Create = () => {
     const [name, setName] = useState('')
     const [content, setContent] = useState('')
@@ -104,7 +107,7 @@ const Create = () => {
                 setUploading(false)
             }
 
-            const response = await fetch('http://localhost:3001/tratamientos', {
+            const response = await fetch(`${API_URL}/tratamientos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

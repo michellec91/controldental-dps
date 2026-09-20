@@ -6,6 +6,9 @@ import { Cita } from "./types/agenda.types";
 import { AgendaCalendarGrid } from "./components/AgendaCalendarGrid";
 import { MiniCalendar } from "./components/MiniCalendar";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function AgendaView() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date>(new Date()); // Fecha seleccionada real (Hoy)
@@ -24,7 +27,7 @@ export default function AgendaView() {
 
   const cargarCitas = async () => {
     try {
-      const res = await fetch("http://localhost:3001/citas");
+      const res = await fetch(`${API_URL}/citas`);
       if (res.ok) {
         const data = await res.json();
         setCitas(data);
@@ -42,7 +45,7 @@ export default function AgendaView() {
     if (!confirm("¿Deseas cancelar/eliminar esta cita?")) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/citas/${id}`, {
+      const res = await fetch(`${API_URL}/citas/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
