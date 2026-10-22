@@ -15,13 +15,15 @@ import {
 
 import { useAuth } from "../../../context/AuthContext";
 import { useUploadThing } from "../../../lib/uploadthing-client";
+import { actualizarImagenPerfil } from "../../../services/usuariosService";
 import styles from "./PerfilCard.module.css";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
 export default function PerfilCard() {
-  const { usuario, cerrarSesion, actualizarUsuarioSesion } = useAuth();
+  const {
+    usuario,
+    cerrarSesion,
+    actualizarUsuarioSesion,
+  } = useAuth();
 
   const router = useRouter();
   const inputFotoRef = useRef<HTMLInputElement>(null);
@@ -38,10 +40,14 @@ export default function PerfilCard() {
     inputFotoRef.current?.click();
   };
 
-  const handleFoto = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFoto = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
 
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     if (!file.type.startsWith("image/")) {
       alert("Selecciona un archivo de imagen.");
@@ -56,37 +62,52 @@ export default function PerfilCard() {
     try {
       setSubiendoFoto(true);
 
+      // 1. Subir la imagen a UploadThing
       const uploaded = await startUpload([file]);
 
-      if (!uploaded || !uploaded[0]) {
-        throw new Error("No fue posible subir la imagen.");
+      if (!uploaded || uploaded.length === 0) {
+        throw new Error(
+          "No fue posible subir la imagen a UploadThing."
+        );
       }
 
-      const nuevaImagen = uploaded[0].url;
+      // Algunas versiones de UploadThing usan ufsUrl
+      // y otras también incluyen url.
+      const nuevaImagen =
+        uploaded[0].ufsUrl ||
+        uploaded[0].url;
 
-      const respuesta = await fetch(
-        `${API_URL}/usuarios/${usuario.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            imagenPerfil: nuevaImagen,
-          }),
-        }
+      if (!nuevaImagen) {
+        throw new Error(
+          "UploadThing no devolvió una URL válida."
+        );
+      }
+
+      // 2. Guardar la URL en MySQL mediante nuestra API
+      await actualizarImagenPerfil(
+        usuario.id,
+        nuevaImagen
       );
 
-      if (!respuesta.ok) {
-        throw new Error("No fue posible actualizar el usuario.");
-      }
-
+      // 3. Actualizar AuthContext y localStorage
       actualizarUsuarioSesion({
         imagenPerfil: nuevaImagen,
       });
+
+      alert("Fotografía actualizada correctamente.");
     } catch (error) {
-      console.error(error);
-      alert("No fue posible actualizar la fotografía.");
+      console.error(
+        "Error al actualizar fotografía:",
+        error
+      );
+
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert(
+          "No fue posible actualizar la fotografía."
+        );
+      }
     } finally {
       setSubiendoFoto(false);
 
@@ -100,6 +121,21 @@ export default function PerfilCard() {
     cerrarSesion();
     router.replace("/login");
   };
+
+  const nombreCompleto = [
+    usuario.nombre,
+    usuario.apellido,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const esAdministrador =
+    usuario.rol?.toLowerCase() ===
+    "administrador";
+
+  const estaActivo =
+    usuario.estado?.toLowerCase() ===
+    "activo";
 
   return (
     <section className={styles.card}>
@@ -127,7 +163,9 @@ export default function PerfilCard() {
               }}
             />
           ) : (
-            <FaUserCircle className={styles.defaultAvatar} />
+            <FaUserCircle
+              className={styles.defaultAvatar}
+            />
           )}
 
           <span className={styles.cameraButton}>
@@ -135,18 +173,21 @@ export default function PerfilCard() {
           </span>
         </button>
 
-        <h2 className={styles.name}>{usuario.nombre}{usuario.apellido ?? ""}</h2>
+        <h2 className={styles.name}>
+          {nombreCompleto}
+        </h2>
 
         <p className={styles.role}>
-          {usuario.rol === "admin"
+          {esAdministrador
             ? "Administrador"
             : usuario.rol}
         </p>
 
         <span className={styles.statusBadge}>
           <span className={styles.statusDot}></span>
-          {usuario.estado === "activo"
-            ? "Cuenta activa"
+
+          {estaActivo
+            ? "Activo"
             : usuario.estado}
         </span>
 
@@ -170,7 +211,9 @@ export default function PerfilCard() {
           <button
             type="button"
             className={styles.editButton}
-            onClick={() => router.push("/perfil/editar")}
+            onClick={() =>
+              router.push("/perfil/editar")
+            }
           >
             <FaPen />
             Editar perfil
@@ -184,16 +227,21 @@ export default function PerfilCard() {
               <span>Nombre</span>
             </div>
 
-            <span className={styles.value}>{usuario.nombre}</span>
+            <span className={styles.value}>
+              {usuario.nombre}
+            </span>
           </div>
 
           <div className={styles.detailRow}>
             <div className={styles.label}>
-                <FaUserCircle />
-                <span>Apellido</span>
+              <FaUserCircle />
+              <span>Apellido</span>
             </div>
 
-            <span className={styles.value}>{usuario.apellido || "No registrado"}</span>
+            <span className={styles.value}>
+              {usuario.apellido ||
+                "No registrado"}
+            </span>
           </div>
 
           <div className={styles.detailRow}>
@@ -202,7 +250,9 @@ export default function PerfilCard() {
               <span>Correo electrónico</span>
             </div>
 
-            <span className={styles.value}>{usuario.correo}</span>
+            <span className={styles.value}>
+              {usuario.correo}
+            </span>
           </div>
 
           <div className={styles.detailRow}>
@@ -211,7 +261,10 @@ export default function PerfilCard() {
               <span>Teléfono</span>
             </div>
 
-            <span className={styles.value}>{usuario.telefono || "No registrado"}</span>
+            <span className={styles.value}>
+              {usuario.telefono ||
+                "No registrado"}
+            </span>
           </div>
 
           <div className={styles.detailRow}>
@@ -220,8 +273,8 @@ export default function PerfilCard() {
               <span>Rol</span>
             </div>
 
-            <span>
-              {usuario.rol === "admin"
+            <span className={styles.value}>
+              {esAdministrador
                 ? "Administrador"
                 : usuario.rol}
             </span>
@@ -235,7 +288,8 @@ export default function PerfilCard() {
 
             <span className={styles.activeText}>
               <span className={styles.smallDot}></span>
-              {usuario.estado === "activo"
+
+              {estaActivo
                 ? "Activo"
                 : usuario.estado}
             </span>
@@ -252,6 +306,7 @@ export default function PerfilCard() {
 
             <div>
               <h3>Seguridad de la cuenta</h3>
+
               <p>
                 Contraseña
                 <span className={styles.password}>
@@ -264,7 +319,11 @@ export default function PerfilCard() {
           <button
             type="button"
             className={styles.passwordButton}
-            onClick={() => router.push("/perfil/cambiar-password")}
+            onClick={() =>
+              router.push(
+                "/perfil/cambiar-password"
+              )
+            }
           >
             Cambiar contraseña
           </button>

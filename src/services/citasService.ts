@@ -1,58 +1,97 @@
-// Define la estructura que tendrá cada cita.
 export interface Cita {
-  id: string;
-  pacienteNombre: string;
-  tratamientoNombre: string;
-  fecha: string;
-  hora: string;
+  id_cita: number;
+
+  id_usuario: number;
+  paciente_nombre: string;
+  paciente_apellido: string;
   correo: string;
   telefono: string;
+
+  id_tratamiento: number;
+  tratamiento_nombre: string;
+
+  fecha: string;
+  hora: string;
   estado: string;
+
+  fecha_creacion?: string;
 }
 
-// Dirección donde está funcionando nuestro JSON Server.
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:3001";
 
-// Obtiene todas las citas registradas en la API.
+// -----------------------------------------
+// OBTENER TODAS LAS CITAS
+// -----------------------------------------
 export async function obtenerCitas(): Promise<Cita[]> {
-  const respuesta = await fetch(`${API_URL}/citas`);
+  const respuesta = await fetch(
+    `${API_URL}/citas`
+  );
 
-// Verificamos que la petición haya respondido correctamente.
-  if (!respuesta.ok) {
-    throw new Error("No se pudieron consultar las citas.");
-  }
-
-  return await respuesta.json();
-}
-
-// Obtiene únicamente las citas que están pendientes de revisión.
-export async function obtenerSolicitudesPendientes(): Promise<Cita[]> {
-  const respuesta = await fetch(`${API_URL}/citas?estado=pendiente`);
+  const data = await respuesta.json();
 
   if (!respuesta.ok) {
-    throw new Error("No se pudieron consultar las solicitudes pendientes.");
+    throw new Error(
+      data.error ||
+        "No se pudieron consultar las citas."
+    );
   }
 
-  return await respuesta.json();
+  return data;
 }
 
-// Actualiza el estado de una cita.
+// -----------------------------------------
+// OBTENER SOLICITUDES PENDIENTES
+// -----------------------------------------
+export async function obtenerSolicitudesPendientes(): Promise<
+  Cita[]
+> {
+  const respuesta = await fetch(
+    `${API_URL}/citas?estado=pendiente`
+  );
+
+  const data = await respuesta.json();
+
+  if (!respuesta.ok) {
+    throw new Error(
+      data.error ||
+        "No se pudieron consultar las solicitudes pendientes."
+    );
+  }
+
+  return data;
+}
+
+// -----------------------------------------
+// ACTUALIZAR ESTADO
+// -----------------------------------------
 export async function actualizarEstadoCita(
-  id: string,
+  id: number,
   estado: string
 ): Promise<Cita> {
-  const respuesta = await fetch(`${API_URL}/citas/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ estado }),
-  });
+  const respuesta = await fetch(
+    `${API_URL}/citas/${id}/estado`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify({
+        estado,
+      }),
+    }
+  );
+
+  const data = await respuesta.json();
 
   if (!respuesta.ok) {
-    throw new Error("No se pudo actualizar el estado de la cita.");
+    throw new Error(
+      data.error ||
+        "No se pudo actualizar el estado de la cita."
+    );
   }
 
-  return await respuesta.json();
+  return data.cita || data;
 }

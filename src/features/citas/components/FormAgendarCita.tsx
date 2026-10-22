@@ -1,184 +1,643 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Cita } from "../../agenda/types/agenda.types";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  process.env
+    .NEXT_PUBLIC_API_URL ||
+  "http://localhost:3001";
 
-interface FormAgendarCitaProps {
-  onCitaCreada?: (cita: Cita) => void;
+interface Usuario {
+  id_usuario: number;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  telefono: string;
+  rol: string;
+  estado: string;
 }
 
-export function FormAgendarCita({ onCitaCreada }: FormAgendarCitaProps) {
-  const [pacienteNombre, setPacienteNombre] = useState("");
-  const [tratamientoNombre, setTratamientoNombre] = useState("Limpieza Dental");
-  const [fecha, setFecha] = useState("");
-  const [hora, setHora] = useState("08:00 AM");
-  const [errorNombre, setErrorNombre] = useState("");
-  const [errorGeneral, setErrorGeneral] = useState("");
-  const [citasExistentes, setCitasExistentes] = useState<Cita[]>([]);
+interface Tratamiento {
+  id_tratamiento: number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  duracion: number;
+  estado: string;
+  imagen?: string | null;
+}
 
-  // Formato YYYY-MM-DD para la fecha mínima
-  const hoy = new Date();
-  const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+interface FormAgendarCitaProps {
+  onCitaCreada?: () => void;
+}
 
-  // Cargar citas existentes para comprobar duplicados
+export function FormAgendarCita({
+  onCitaCreada,
+}: FormAgendarCitaProps) {
+  const [
+    usuarios,
+    setUsuarios,
+  ] =
+    useState<Usuario[]>([]);
+
+  const [
+    tratamientos,
+    setTratamientos,
+  ] =
+    useState<
+      Tratamiento[]
+    >([]);
+
+  const [
+    idUsuario,
+    setIdUsuario,
+  ] =
+    useState("");
+
+  const [
+    idTratamiento,
+    setIdTratamiento,
+  ] =
+    useState("");
+
+  const [
+    fecha,
+    setFecha,
+  ] =
+    useState("");
+
+  const [
+    hora,
+    setHora,
+  ] =
+    useState(
+      "08:00"
+    );
+
+  const [
+    errorGeneral,
+    setErrorGeneral,
+  ] =
+    useState("");
+
+  const [
+    cargando,
+    setCargando,
+  ] =
+    useState(true);
+
+  const [
+    guardando,
+    setGuardando,
+  ] =
+    useState(false);
+
+  // -----------------------------------------
+  // FECHA MÍNIMA
+  // -----------------------------------------
+  const hoy =
+    new Date();
+
+  const hoyStr =
+    `${hoy.getFullYear()}-${String(
+      hoy.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    )}-${String(
+      hoy.getDate()
+    ).padStart(
+      2,
+      "0"
+    )}`;
+
+  // -----------------------------------------
+  // CARGAR PACIENTES Y TRATAMIENTOS
+  // -----------------------------------------
   useEffect(() => {
-    fetch(`${API_URL}/citas`)
-      .then((res) => res.json())
-      .then((data) => setCitasExistentes(data))
-      .catch((err) => console.error("Error al obtener citas:", err));
+    async function cargarDatos() {
+      try {
+        setCargando(
+          true
+        );
+
+        const [
+          respuestaUsuarios,
+          respuestaTratamientos,
+        ] =
+          await Promise.all(
+            [
+              fetch(
+                `${API_URL}/usuarios`
+              ),
+
+              fetch(
+                `${API_URL}/tratamientos`
+              ),
+            ]
+          );
+
+        if (
+          !respuestaUsuarios.ok ||
+          !respuestaTratamientos.ok
+        ) {
+          throw new Error(
+            "No fue posible cargar los datos."
+          );
+        }
+
+        const usuariosData =
+          await respuestaUsuarios.json();
+
+        const tratamientosData =
+          await respuestaTratamientos.json();
+
+        // Solo pacientes activos
+        const pacientesActivos =
+          usuariosData.filter(
+            (
+              usuario: Usuario
+            ) =>
+              usuario.rol
+                ?.toLowerCase() ===
+                "paciente" &&
+              usuario.estado
+                ?.toLowerCase() ===
+                "activo"
+          );
+
+        // Solo tratamientos activos
+        const tratamientosActivos =
+          tratamientosData.filter(
+            (
+              tratamiento: Tratamiento
+            ) =>
+              tratamiento.estado
+                ?.toLowerCase() ===
+              "activo"
+          );
+
+        setUsuarios(
+          pacientesActivos
+        );
+
+        setTratamientos(
+          tratamientosActivos
+        );
+
+        if (
+          pacientesActivos.length >
+          0
+        ) {
+          setIdUsuario(
+            String(
+              pacientesActivos[0]
+                .id_usuario
+            )
+          );
+        }
+
+        if (
+          tratamientosActivos.length >
+          0
+        ) {
+          setIdTratamiento(
+            String(
+              tratamientosActivos[0]
+                .id_tratamiento
+            )
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Error al cargar datos:",
+          error
+        );
+
+        setErrorGeneral(
+          "No fue posible cargar pacientes o tratamientos."
+        );
+      } finally {
+        setCargando(
+          false
+        );
+      }
+    }
+
+    cargarDatos();
   }, []);
 
-  const normalizarHora = (h: string) =>
-    h.trim().toUpperCase().replace(/^0/, "");
+  // -----------------------------------------
+  // HORAS DISPONIBLES
+  // -----------------------------------------
+  const horasDisponibles =
+    [
+      "08:00",
+      "09:00",
+      "10:00",
+      "11:00",
+      "12:00",
+      "13:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00",
+    ];
 
-  const handleNombreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const valor = e.target.value;
-    const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
+  // -----------------------------------------
+  // FORMATEAR HORA VISUALMENTE
+  // -----------------------------------------
+  const formatearHora = (
+    hora: string
+  ) => {
+    const [
+      horas,
+      minutos,
+    ] =
+      hora.split(
+        ":"
+      );
 
-    if (!regexSoloLetras.test(valor)) {
-      setErrorNombre("El nombre solo puede contener letras y espacios.");
-    } else {
-      setErrorNombre("");
+    const numeroHora =
+      Number(
+        horas
+      );
+
+    if (
+      numeroHora ===
+      12
+    ) {
+      return `12:${minutos} M`;
     }
-    setPacienteNombre(valor);
-    setErrorGeneral("");
+
+    if (
+      numeroHora >
+      12
+    ) {
+      return `${
+        numeroHora -
+        12
+      }:${minutos} PM`;
+    }
+
+    return `${numeroHora}:${minutos} AM`;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorGeneral("");
+  // -----------------------------------------
+  // AGENDAR CITA
+  // -----------------------------------------
+  const handleSubmit =
+    async (
+      e: React.FormEvent
+    ) => {
+      e.preventDefault();
 
-    // 1. Validar nombre solo letras
-    const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-    if (!pacienteNombre.trim() || !regexSoloLetras.test(pacienteNombre.trim())) {
-      setErrorNombre("El nombre solo puede contener letras y espacios.");
-      return;
-    }
+      setErrorGeneral(
+        ""
+      );
 
-    // 2. Validar fecha seleccionada
-    if (!fecha) {
-      setErrorGeneral("Por favor seleccione una fecha.");
-      return;
-    }
+      if (
+        !idUsuario ||
+        !idTratamiento
+      ) {
+        setErrorGeneral(
+          "Selecciona un paciente y un tratamiento."
+        );
 
-    // 3. Validar que no sea fecha anterior a la actual
-    if (fecha < hoyStr) {
-      setErrorGeneral("No se pueden agendar citas en fechas pasadas.");
-      return;
-    }
+        return;
+      }
 
-    // Parsear fecha seleccionada (evitando desfasaje UTC)
-    const [year, month, day] = fecha.split("-").map(Number);
-    const fechaObj = new Date(year, month - 1, day);
-    const diaSemana = fechaObj.getDay(); // 0 = Domingo, 6 = Sábado
+      if (!fecha) {
+        setErrorGeneral(
+          "Selecciona una fecha."
+        );
 
-    // 4. Validar Domingo
-    if (diaSemana === 0) {
-      setErrorGeneral("La clínica no atiende los días domingo.");
-      return;
-    }
+        return;
+      }
 
-    // 5. Validar Sábado por la tarde (Solo 8:00 AM a 12:00 M)
-    const horasTardeSabado = ["01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
-    if (diaSemana === 6 && horasTardeSabado.includes(hora)) {
-      setErrorGeneral("Los sábados la clínica solo atiende de 8:00 AM a 12:00 M.");
-      return;
-    }
+      if (
+        fecha <
+        hoyStr
+      ) {
+        setErrorGeneral(
+          "No se pueden agendar citas en fechas pasadas."
+        );
 
-    // 6. Validar citas duplicadas en la misma fecha y hora (no canceladas)
-    const ocupado = citasExistentes.some((c) => {
-      const fechaCita = c.fecha.split("T")[0].trim();
-      const esMismaFecha = fechaCita === fecha.trim();
-      const esMismaHora = normalizarHora(c.hora) === normalizarHora(hora);
-      const estaActiva = c.estado !== "cancelada";
+        return;
+      }
 
-      return esMismaFecha && esMismaHora && estaActiva;
-    });
+      const [
+        year,
+        month,
+        day,
+      ] =
+        fecha
+          .split(
+            "-"
+          )
+          .map(
+            Number
+          );
 
-    if (ocupado) {
-      setErrorGeneral("Ya existe una cita agendada para ese día y esa hora.");
-      return;
-    }
+      const fechaObj =
+        new Date(
+          year,
+          month - 1,
+          day
+        );
 
-    const nuevaCita = {
-      pacienteNombre: pacienteNombre.trim(),
-      tratamientoNombre,
-      fecha,
-      hora,
-      estado: "confirmada",
+      const diaSemana =
+        fechaObj.getDay();
+
+      // -----------------------------------------
+      // DOMINGO
+      // -----------------------------------------
+      if (
+        diaSemana ===
+        0
+      ) {
+        setErrorGeneral(
+          "La clínica no atiende los días domingo."
+        );
+
+        return;
+      }
+
+      // -----------------------------------------
+      // SÁBADO POR LA TARDE
+      // -----------------------------------------
+      if (
+        diaSemana ===
+          6 &&
+        [
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+        ].includes(
+          hora
+        )
+      ) {
+        setErrorGeneral(
+          "Los sábados la clínica solo atiende de 8:00 AM a 12:00 M."
+        );
+
+        return;
+      }
+
+      try {
+        setGuardando(
+          true
+        );
+
+        const respuesta =
+          await fetch(
+            `${API_URL}/citas`,
+            {
+              method:
+                "POST",
+
+              headers:
+                {
+                  "Content-Type":
+                    "application/json",
+                },
+
+              body:
+                JSON.stringify(
+                  {
+                    id_usuario:
+                      Number(
+                        idUsuario
+                      ),
+
+                    id_tratamiento:
+                      Number(
+                        idTratamiento
+                      ),
+
+                    fecha,
+
+                    hora:
+                      `${hora}:00`,
+
+                    // Al crearla desde
+                    // la web administrativa
+                    // se registra confirmada.
+                    estado:
+                      "Confirmada",
+                  }
+                ),
+            }
+          );
+
+        const data =
+          await respuesta.json();
+
+        if (
+          !respuesta.ok
+        ) {
+          throw new Error(
+            data.error ||
+              data.mensaje ||
+              "No fue posible registrar la cita."
+          );
+        }
+
+        // -----------------------------------------
+        // LIMPIAR FORMULARIO
+        // -----------------------------------------
+        setFecha("");
+        setHora(
+          "08:00"
+        );
+
+        if (
+          onCitaCreada
+        ) {
+          await onCitaCreada();
+        }
+      } catch (error) {
+        console.error(
+          "Error al crear cita:",
+          error
+        );
+
+        setErrorGeneral(
+          error instanceof
+            Error
+            ? error.message
+            : "Error al conectar con el servidor."
+        );
+      } finally {
+        setGuardando(
+          false
+        );
+      }
     };
 
-    try {
-      const res = await fetch(`${API_URL}/citas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevaCita),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setPacienteNombre("");
-        setFecha("");
-        setErrorNombre("");
-        setErrorGeneral("");
-        if (onCitaCreada) onCitaCreada(data);
-      }
-    } catch (err) {
-      setErrorGeneral("Error al conectar con el servidor.");
-    }
-  };
+  // -----------------------------------------
+  // CARGANDO
+  // -----------------------------------------
+  if (cargando) {
+    return (
+      <div className="py-8 text-center text-sm text-gray-500">
+        Cargando datos...
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={
+        handleSubmit
+      }
+      className="space-y-4"
+    >
+      {/* PACIENTE */}
       <div>
         <label className="block text-xs font-bold text-gray-700 mb-1">
-          Nombre del Paciente
+          Paciente
         </label>
-        <input
-          type="text"
-          value={pacienteNombre}
-          onChange={handleNombreChange}
-          placeholder="Ej. Juan Pérez"
-          className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none"
-        />
-        {errorNombre && (
-          <p className="mt-1 text-xs text-red-500 font-semibold">{errorNombre}</p>
-        )}
+
+        <select
+          value={
+            idUsuario
+          }
+          onChange={(
+            e
+          ) => {
+            setIdUsuario(
+              e.target
+                .value
+            );
+
+            setErrorGeneral(
+              ""
+            );
+          }}
+          className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white"
+          required
+        >
+          {usuarios.length ===
+          0 ? (
+            <option value="">
+              No hay
+              pacientes
+              registrados
+            </option>
+          ) : (
+            usuarios.map(
+              (
+                usuario
+              ) => (
+                <option
+                  key={
+                    usuario.id_usuario
+                  }
+                  value={
+                    usuario.id_usuario
+                  }
+                >
+                  {
+                    usuario.nombre
+                  }{" "}
+                  {
+                    usuario.apellido
+                  }
+                </option>
+              )
+            )
+          )}
+        </select>
       </div>
 
+      {/* TRATAMIENTO */}
       <div>
         <label className="block text-xs font-bold text-gray-700 mb-1">
           Tratamiento
         </label>
+
         <select
-          value={tratamientoNombre}
-          onChange={(e) => setTratamientoNombre(e.target.value)}
+          value={
+            idTratamiento
+          }
+          onChange={(
+            e
+          ) => {
+            setIdTratamiento(
+              e.target
+                .value
+            );
+
+            setErrorGeneral(
+              ""
+            );
+          }}
           className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white"
+          required
         >
-          <option value="Limpieza Dental">Limpieza Dental</option>
-          <option value="Rellenos">Rellenos</option>
-          <option value="Extracción">Extracción</option>
-          <option value="Ortodoncia">Ortodoncia</option>
+          {tratamientos.length ===
+          0 ? (
+            <option value="">
+              No hay
+              tratamientos
+              disponibles
+            </option>
+          ) : (
+            tratamientos.map(
+              (
+                tratamiento
+              ) => (
+                <option
+                  key={
+                    tratamiento.id_tratamiento
+                  }
+                  value={
+                    tratamiento.id_tratamiento
+                  }
+                >
+                  {
+                    tratamiento.nombre
+                  }
+                </option>
+              )
+            )
+          )}
         </select>
       </div>
 
+      {/* FECHA Y HORA */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-bold text-gray-700 mb-1">
             Fecha
           </label>
+
           <input
             type="date"
             min={hoyStr}
-            value={fecha}
-            onChange={(e) => {
-              setFecha(e.target.value);
-              setErrorGeneral("");
+            value={
+              fecha
+            }
+            onChange={(
+              e
+            ) => {
+              setFecha(
+                e.target
+                  .value
+              );
+
+              setErrorGeneral(
+                ""
+              );
             }}
             className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none"
+            required
           />
         </div>
 
@@ -186,40 +645,71 @@ export function FormAgendarCita({ onCitaCreada }: FormAgendarCitaProps) {
           <label className="block text-xs font-bold text-gray-700 mb-1">
             Hora
           </label>
+
           <select
             value={hora}
-            onChange={(e) => {
-              setHora(e.target.value);
-              setErrorGeneral("");
+            onChange={(
+              e
+            ) => {
+              setHora(
+                e.target
+                  .value
+              );
+
+              setErrorGeneral(
+                ""
+              );
             }}
             className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white"
+            required
           >
-            <option value="08:00 AM">08:00 AM</option>
-            <option value="09:00 AM">09:00 AM</option>
-            <option value="10:00 AM">10:00 AM</option>
-            <option value="11:00 AM">11:00 AM</option>
-            <option value="12:00 M">12:00 M</option>
-            <option value="01:00 PM">01:00 PM</option>
-            <option value="02:00 PM">02:00 PM</option>
-            <option value="03:00 PM">03:00 PM</option>
-            <option value="04:00 PM">04:00 PM</option>
-            <option value="05:00 PM">05:00 PM</option>
+            {horasDisponibles.map(
+              (
+                horaDisponible
+              ) => (
+                <option
+                  key={
+                    horaDisponible
+                  }
+                  value={
+                    horaDisponible
+                  }
+                >
+                  {formatearHora(
+                    horaDisponible
+                  )}
+                </option>
+              )
+            )}
           </select>
         </div>
       </div>
 
-      {/* MENSAJE DE ERROR DENTRO DE LA WEB (Sin alert del navegador) */}
+      {/* ERROR */}
       {errorGeneral && (
         <div className="rounded-lg bg-red-50 p-2.5 text-xs font-semibold text-red-600 border border-red-200">
-          ⚠️ {errorGeneral}
+          ⚠️{" "}
+          {
+            errorGeneral
+          }
         </div>
       )}
 
+      {/* BOTÓN */}
       <button
         type="submit"
-        className="w-full rounded-xl bg-blue-600 py-3 text-xs font-bold text-white hover:bg-blue-700 transition-colors"
+        disabled={
+          guardando ||
+          usuarios.length ===
+            0 ||
+          tratamientos.length ===
+            0
+        }
+        className="w-full rounded-xl bg-blue-600 py-3 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
       >
-        Confirmar y Agendar Cita
+        {guardando
+          ? "Registrando..."
+          : "Confirmar y Agendar Cita"}
       </button>
     </form>
   );

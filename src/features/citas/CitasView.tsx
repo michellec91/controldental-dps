@@ -1,151 +1,316 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import Navbar from "../../components/Navbar";
+
+import {
+  Cita,
+  obtenerCitas,
+  actualizarEstadoCita,
+} from "../../services/citasService";
+
 import { TarjetaCita } from "./components/TarjetaCita";
 import { ModalAgendarCita } from "./components/ModalAgendarCita";
 import { ModalReprogramarCita } from "./components/ModalReprogramarCita";
-import { Cita } from "../agenda/types/agenda.types";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import {
+  alertError,
+  alertSuccess,
+} from "../../lib/alert";
 
 export function CitasView() {
-  const [citas, setCitas] = useState<Cita[]>([]);
-  const [modalAgendarAbierto, setModalAgendarAbierto] = useState(false);
-  const [citaAReprogramar, setCitaAReprogramar] = useState<Cita | null>(null);
-  const [citaACancelar, setCitaACancelar] = useState<string | number | null>(null);
+  const [citas, setCitas] =
+    useState<Cita[]>([]);
 
-  const cargarCitas = async () => {
-    try {
-      const res = await fetch(`${API_URL}/citas`);
-      if (res.ok) {
-        const data = await res.json();
-        setCitas(data);
+  const [
+    modalAgendarAbierto,
+    setModalAgendarAbierto,
+  ] = useState(false);
+
+  const [
+    citaAReprogramar,
+    setCitaAReprogramar,
+  ] = useState<Cita | null>(
+    null
+  );
+
+  const [
+    citaACancelar,
+    setCitaACancelar,
+  ] = useState<number | null>(
+    null
+  );
+
+  const [
+    cargando,
+    setCargando,
+  ] = useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  // -----------------------------------------
+  // CARGAR CITAS
+  // -----------------------------------------
+  const cargarCitas =
+    async () => {
+      setCargando(true);
+      setError("");
+
+      try {
+        const datos =
+          await obtenerCitas();
+
+        setCitas(datos);
+      } catch (error) {
+        console.error(
+          "Error al cargar citas:",
+          error
+        );
+
+        setError(
+          "No se pudieron cargar las citas."
+        );
+      } finally {
+        setCargando(false);
       }
-    } catch (err) {
-      console.error("Error al cargar citas:", err);
-    }
-  };
+    };
 
   useEffect(() => {
     cargarCitas();
   }, []);
 
-  const handleCitaCreada = (nuevaCita: Cita) => {
-    setCitas((prev) => [...prev, nuevaCita]);
-  };
+  // -----------------------------------------
+  // CITA CREADA
+  // -----------------------------------------
+  const handleCitaCreada =
+    async () => {
+      // Volvemos a consultar la API
+      // para obtener también paciente,
+      // tratamiento, correo, etc.
+      await cargarCitas();
 
-  const confirmarCancelarCita = async () => {
-    if (!citaACancelar) return;
+      setModalAgendarAbierto(
+        false
+      );
+    };
 
-    try {
-      const res = await fetch(`${API_URL}/citas/${citaACancelar}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estado: "cancelada" }),
-      });
+  // -----------------------------------------
+  // CANCELAR CITA
+  // -----------------------------------------
+  const confirmarCancelarCita =
+    async () => {
+      if (
+        citaACancelar ===
+        null
+      ) {
+        return;
+      }
 
-      if (res.ok) {
-        const citaActualizada = await res.json();
-        setCitas((prev) =>
-          prev.map((c) => (c.id === citaACancelar ? citaActualizada : c))
+      try {
+        await actualizarEstadoCita(
+          citaACancelar,
+          "Cancelada"
+        );
+
+        await cargarCitas();
+
+        alertSuccess(
+          "Cita cancelada"
+        );
+      } catch (error) {
+        console.error(
+          "Error al cancelar cita:",
+          error
+        );
+
+        alertError(
+          "Error",
+          "No fue posible cancelar la cita."
+        );
+      } finally {
+        setCitaACancelar(
+          null
         );
       }
-    } catch (err) {
-      console.error("Error al cancelar cita:", err);
-    } finally {
-      setCitaACancelar(null);
-    }
-  };
+    };
+
+  // -----------------------------------------
+  // CITA REPROGRAMADA
+  // -----------------------------------------
+  const handleCitaActualizada =
+    async () => {
+      await cargarCitas();
+
+      setCitaAReprogramar(
+        null
+      );
+    };
 
   return (
     <>
-      <Navbar /> {/* <-- Renderizamos el Navbar aquí */}
+      <Navbar />
+
       <div className="min-h-screen bg-gray-50 text-gray-900 p-6">
         <div className="container mx-auto max-w-6xl space-y-6">
-          {/* Envoltorio Blanco Superior */}
+
+          {/* CABECERA */}
           <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-extrabold text-gray-800">Gestión de Citas</h1>
+              <h1 className="text-3xl font-extrabold text-gray-800">
+                Gestión de Citas
+              </h1>
+
               <p className="text-sm text-gray-500 mt-1">
-                Agenda, reprograma o cancela tu cita médica.
+                Administra las citas
+                registradas de los
+                pacientes.
               </p>
             </div>
+
             <button
-              onClick={() => setModalAgendarAbierto(true)}
+              type="button"
+              onClick={() =>
+                setModalAgendarAbierto(
+                  true
+                )
+              }
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-blue-700 transition-all active:scale-95"
             >
-              <span className="text-lg font-bold">+</span> Nueva Cita
+              <span className="text-lg font-bold">
+                +
+              </span>
+
+              Nueva Cita
             </button>
           </div>
 
-          {/* Sección Principal de Citas */}
+          {/* LISTADO */}
           <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 space-y-4">
             <h2 className="text-lg font-bold text-gray-700">
-              Citas Registradas ({citas.length})
+              Citas Registradas
+              {!cargando &&
+                ` (${citas.length})`}
             </h2>
 
-            {citas.length === 0 ? (
+            {cargando ? (
+              <div className="p-12 text-center text-gray-500">
+                Cargando citas...
+              </div>
+            ) : error ? (
+              <div className="p-12 text-center text-red-600">
+                {error}
+              </div>
+            ) : citas.length ===
+              0 ? (
               <div className="rounded-2xl border border-dashed border-gray-300 p-12 text-center text-gray-400">
-                No hay citas registradas. Haz clic en <strong>"+ Nueva Cita"</strong> para agendar una.
+                No hay citas
+                registradas.
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {citas.map((cita) => (
-                  <TarjetaCita
-                    key={cita.id}
-                    cita={cita}
-                    onReprogramar={(c) => setCitaAReprogramar(c)}
-                    onCancelar={(id) => setCitaACancelar(id)}
-                  />
-                ))}
+                {citas.map(
+                  (cita) => (
+                    <TarjetaCita
+                      key={
+                        cita.id_cita
+                      }
+                      cita={cita}
+                      onReprogramar={(
+                        cita
+                      ) =>
+                        setCitaAReprogramar(
+                          cita
+                        )
+                      }
+                      onCancelar={(
+                        id
+                      ) =>
+                        setCitaACancelar(
+                          id
+                        )
+                      }
+                    />
+                  )
+                )}
               </div>
             )}
           </div>
 
-          {/* Modal de Nueva Cita */}
+          {/* MODAL AGENDAR */}
           <ModalAgendarCita
-            isOpen={modalAgendarAbierto}
-            onClose={() => setModalAgendarAbierto(false)}
-            onCitaCreada={handleCitaCreada}
+            isOpen={
+              modalAgendarAbierto
+            }
+            onClose={() =>
+              setModalAgendarAbierto(
+                false
+              )
+            }
+            onCitaCreada={
+              handleCitaCreada
+            }
           />
 
-          {/* Modal Reprogramar */}
+          {/* MODAL REPROGRAMAR */}
           {citaAReprogramar && (
             <ModalReprogramarCita
-              cita={citaAReprogramar}
-              todasLasCitas={citas}
-              onClose={() => setCitaAReprogramar(null)}
-              onCitaActualizada={(actualizada) => {
-                setCitas((prev) =>
-                  prev.map((c) => (c.id === actualizada.id ? actualizada : c))
-                );
-                setCitaAReprogramar(null);
-              }}
+              cita={
+                citaAReprogramar
+              }
+              todasLasCitas={
+                citas
+              }
+              onClose={() =>
+                setCitaAReprogramar(
+                  null
+                )
+              }
+              onCitaActualizada={
+                handleCitaActualizada
+              }
             />
           )}
 
-          {/* Modal Cancelar */}
-          {citaACancelar && (
+          {/* MODAL CANCELAR */}
+          {citaACancelar !==
+            null && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
               <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl space-y-4 text-center">
-                <h3 className="text-lg font-bold text-gray-800">¿Cancelar esta cita?</h3>
+                <h3 className="text-lg font-bold text-gray-800">
+                  ¿Cancelar esta
+                  cita?
+                </h3>
+
                 <p className="text-xs text-gray-500">
-                  La cita cambiará a estado cancelado en el historial.
+                  La cita se
+                  conservará en el
+                  historial con
+                  estado Cancelada.
                 </p>
+
                 <div className="flex gap-3 pt-2">
                   <button
-                    onClick={() => setCitaACancelar(null)}
+                    type="button"
+                    onClick={() =>
+                      setCitaACancelar(
+                        null
+                      )
+                    }
                     className="flex-1 rounded-xl border border-gray-300 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50"
                   >
                     Volver
                   </button>
+
                   <button
-                    onClick={confirmarCancelarCita}
+                    type="button"
+                    onClick={
+                      confirmarCancelarCita
+                    }
                     className="flex-1 rounded-xl bg-red-600 py-2.5 text-xs font-bold text-white hover:bg-red-700"
                   >
-                    Sí, Cancelar
+                    Sí, cancelar
                   </button>
                 </div>
               </div>

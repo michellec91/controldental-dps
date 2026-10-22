@@ -1,10 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import {
+  FormEvent,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   FaArrowLeft,
-  FaCheckCircle,
   FaEye,
   FaEyeSlash,
   FaLock,
@@ -13,121 +15,134 @@ import {
 import Navbar from "../../../components/Navbar";
 import ProtectedRoute from "../../../features/autenticacion/components/ProtectedRoute";
 import { useAuth } from "../../../context/AuthContext";
+import { cambiarPasswordUsuario } from "../../../services/usuariosService";
 import styles from "./page.module.css";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
 export default function CambiarPasswordPage() {
-  const { usuario, cerrarSesion } = useAuth();
+  const { usuario } = useAuth();
   const router = useRouter();
 
-  const [contrasenaActual, setContrasenaActual] = useState("");
-  const [nuevaContrasena, setNuevaContrasena] = useState("");
-  const [confirmarContrasena, setConfirmarContrasena] = useState("");
+  const [contrasenaActual, setContrasenaActual] =
+    useState("");
 
-  const [mostrarActual, setMostrarActual] = useState(false);
-  const [mostrarNueva, setMostrarNueva] = useState(false);
-  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+  const [contrasenaNueva, setContrasenaNueva] =
+    useState("");
 
-  const [error, setError] = useState("");
-  const [exito, setExito] = useState("");
-  const [guardando, setGuardando] = useState(false);
+  const [
+    confirmarContrasena,
+    setConfirmarContrasena,
+  ] = useState("");
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [
+    mostrarActual,
+    setMostrarActual,
+  ] = useState(false);
+
+  const [
+    mostrarNueva,
+    setMostrarNueva,
+  ] = useState(false);
+
+  const [
+    mostrarConfirmacion,
+    setMostrarConfirmacion,
+  ] = useState(false);
+
+  const [guardando, setGuardando] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [exito, setExito] =
+    useState("");
+
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     setError("");
     setExito("");
 
     if (!usuario) {
-      setError("No se encontró una sesión activa.");
-      return;
-    }
-
-    if (
-      !contrasenaActual.trim() ||
-      !nuevaContrasena.trim() ||
-      !confirmarContrasena.trim()
-    ) {
-      setError("Completa todos los campos.");
-      return;
-    }
-
-    if (nuevaContrasena.length < 8) {
-      setError("La nueva contraseña debe tener al menos 8 caracteres.");
-      return;
-    }
-
-    if (nuevaContrasena === contrasenaActual) {
       setError(
-        "La nueva contraseña debe ser diferente de la contraseña actual."
+        "No se encontró una sesión activa."
       );
       return;
     }
 
-    if (nuevaContrasena !== confirmarContrasena) {
-      setError("Las nuevas contraseñas no coinciden.");
+    if (
+      !contrasenaActual ||
+      !contrasenaNueva ||
+      !confirmarContrasena
+    ) {
+      setError(
+        "Completa todos los campos."
+      );
+      return;
+    }
+
+    if (contrasenaNueva.length < 8) {
+      setError(
+        "La nueva contraseña debe tener al menos 8 caracteres."
+      );
+      return;
+    }
+
+    if (
+      contrasenaNueva !==
+      confirmarContrasena
+    ) {
+      setError(
+        "Las contraseñas nuevas no coinciden."
+      );
+      return;
+    }
+
+    if (
+      contrasenaActual ===
+      contrasenaNueva
+    ) {
+      setError(
+        "La nueva contraseña debe ser diferente a la contraseña actual."
+      );
       return;
     }
 
     try {
       setGuardando(true);
 
-      // Obtener los datos actuales del usuario.
-      const respuestaUsuario = await fetch(
-        `${API_URL}/usuarios/${usuario.id}`
+      await cambiarPasswordUsuario(
+        usuario.id,
+        contrasenaActual,
+        contrasenaNueva
       );
-
-      if (!respuestaUsuario.ok) {
-        throw new Error("No fue posible consultar el usuario.");
-      }
-
-      const usuarioActual = await respuestaUsuario.json();
-
-      // Comprobar la contraseña actual.
-      if (usuarioActual.contrasena !== contrasenaActual) {
-        setError("La contraseña actual es incorrecta.");
-        return;
-      }
-
-      // Actualizar únicamente la contraseña.
-      const respuestaActualizacion = await fetch(
-        `${API_URL}/usuarios/${usuario.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contrasena: nuevaContrasena,
-          }),
-        }
-      );
-
-      if (!respuestaActualizacion.ok) {
-        throw new Error("No fue posible actualizar la contraseña.");
-      }
 
       setExito(
-        "Contraseña actualizada correctamente. Serás redirigido al inicio de sesión."
+        "La contraseña se actualizó correctamente."
       );
 
       setContrasenaActual("");
-      setNuevaContrasena("");
+      setContrasenaNueva("");
       setConfirmarContrasena("");
 
-      // Por seguridad, cerrar la sesión después de cambiar contraseña.
       setTimeout(() => {
-        cerrarSesion();
-        router.replace("/login");
-      }, 1500);
+        router.push("/perfil");
+      }, 1200);
     } catch (error) {
-      console.error(error);
-
-      setError(
-        "No fue posible conectar con el servidor. Verifica que la API esté activa."
+      console.error(
+        "Error cambiando contraseña:",
+        error
       );
+
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(
+          "No fue posible cambiar la contraseña."
+        );
+      }
     } finally {
       setGuardando(false);
     }
@@ -142,57 +157,80 @@ export default function CambiarPasswordPage() {
           <button
             type="button"
             className={styles.backButton}
-            onClick={() => router.push("/perfil")}
+            onClick={() =>
+              router.push("/perfil")
+            }
           >
             <FaArrowLeft />
             Volver al perfil
           </button>
 
-          <div className={styles.header}>
+          <header className={styles.header}>
             <h1>Cambiar contraseña</h1>
+
             <p>
-              Actualiza la contraseña utilizada para acceder a tu cuenta
-              administrativa.
+              Actualiza la contraseña de tu
+              cuenta administrativa.
             </p>
-          </div>
+          </header>
 
-          <section className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div className={styles.lockIcon}>
-                <FaLock />
-              </div>
-
+          <form
+            className={styles.card}
+            onSubmit={handleSubmit}
+          >
+            <div
+              className={styles.sectionHeader}
+            >
               <div>
-                <h2>Seguridad de la cuenta</h2>
-                <p>
-                  Utiliza una contraseña diferente a la que tienes actualmente.
-                </p>
+                <span>
+                  Seguridad de la cuenta
+                </span>
+
+                <h2>
+                  Actualizar contraseña
+                </h2>
               </div>
             </div>
 
-            <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.formGrid}>
+              {/* CONTRASEÑA ACTUAL */}
               <div className={styles.field}>
-                <label htmlFor="actual">Contraseña actual</label>
+                <label htmlFor="actual">
+                  Contraseña actual
+                </label>
 
-                <div className={styles.inputContainer}>
-                  <FaLock className={styles.inputIcon} />
+                <div
+                  className={
+                    styles.inputContainer
+                  }
+                >
+                  <FaLock />
 
                   <input
                     id="actual"
-                    type={mostrarActual ? "text" : "password"}
-                    value={contrasenaActual}
-                    onChange={(event) =>
-                      setContrasenaActual(event.target.value)
+                    type={
+                      mostrarActual
+                        ? "text"
+                        : "password"
                     }
-                    placeholder="Ingresa tu contraseña actual"
+                    value={
+                      contrasenaActual
+                    }
+                    onChange={(e) =>
+                      setContrasenaActual(
+                        e.target.value
+                      )
+                    }
+                    placeholder="Contraseña actual"
                     autoComplete="current-password"
                   />
 
                   <button
                     type="button"
-                    className={styles.eyeButton}
                     onClick={() =>
-                      setMostrarActual((valorActual) => !valorActual)
+                      setMostrarActual(
+                        (valor) => !valor
+                      )
                     }
                     aria-label={
                       mostrarActual
@@ -200,33 +238,53 @@ export default function CambiarPasswordPage() {
                         : "Mostrar contraseña"
                     }
                   >
-                    {mostrarActual ? <FaEyeSlash /> : <FaEye />}
+                    {mostrarActual ? (
+                      <FaEyeSlash />
+                    ) : (
+                      <FaEye />
+                    )}
                   </button>
                 </div>
               </div>
 
+              {/* CONTRASEÑA NUEVA */}
               <div className={styles.field}>
-                <label htmlFor="nueva">Nueva contraseña</label>
+                <label htmlFor="nueva">
+                  Nueva contraseña
+                </label>
 
-                <div className={styles.inputContainer}>
-                  <FaLock className={styles.inputIcon} />
+                <div
+                  className={
+                    styles.inputContainer
+                  }
+                >
+                  <FaLock />
 
                   <input
                     id="nueva"
-                    type={mostrarNueva ? "text" : "password"}
-                    value={nuevaContrasena}
-                    onChange={(event) =>
-                      setNuevaContrasena(event.target.value)
+                    type={
+                      mostrarNueva
+                        ? "text"
+                        : "password"
                     }
-                    placeholder="Ingresa la nueva contraseña"
+                    value={
+                      contrasenaNueva
+                    }
+                    onChange={(e) =>
+                      setContrasenaNueva(
+                        e.target.value
+                      )
+                    }
+                    placeholder="Nueva contraseña"
                     autoComplete="new-password"
                   />
 
                   <button
                     type="button"
-                    className={styles.eyeButton}
                     onClick={() =>
-                      setMostrarNueva((valorActual) => !valorActual)
+                      setMostrarNueva(
+                        (valor) => !valor
+                      )
                     }
                     aria-label={
                       mostrarNueva
@@ -234,40 +292,52 @@ export default function CambiarPasswordPage() {
                         : "Mostrar contraseña"
                     }
                   >
-                    {mostrarNueva ? <FaEyeSlash /> : <FaEye />}
+                    {mostrarNueva ? (
+                      <FaEyeSlash />
+                    ) : (
+                      <FaEye />
+                    )}
                   </button>
                 </div>
-
-                <span className={styles.helpText}>
-                  Debe contener al menos 8 caracteres.
-                </span>
               </div>
 
+              {/* CONFIRMAR CONTRASEÑA */}
               <div className={styles.field}>
-                <label htmlFor="confirmacion">
+                <label htmlFor="confirmar">
                   Confirmar nueva contraseña
                 </label>
 
-                <div className={styles.inputContainer}>
-                  <FaLock className={styles.inputIcon} />
+                <div
+                  className={
+                    styles.inputContainer
+                  }
+                >
+                  <FaLock />
 
                   <input
-                    id="confirmacion"
-                    type={mostrarConfirmacion ? "text" : "password"}
-                    value={confirmarContrasena}
-                    onChange={(event) =>
-                      setConfirmarContrasena(event.target.value)
+                    id="confirmar"
+                    type={
+                      mostrarConfirmacion
+                        ? "text"
+                        : "password"
                     }
-                    placeholder="Repite la nueva contraseña"
+                    value={
+                      confirmarContrasena
+                    }
+                    onChange={(e) =>
+                      setConfirmarContrasena(
+                        e.target.value
+                      )
+                    }
+                    placeholder="Confirma la nueva contraseña"
                     autoComplete="new-password"
                   />
 
                   <button
                     type="button"
-                    className={styles.eyeButton}
                     onClick={() =>
                       setMostrarConfirmacion(
-                        (valorActual) => !valorActual
+                        (valor) => !valor
                       )
                     }
                     aria-label={
@@ -276,46 +346,55 @@ export default function CambiarPasswordPage() {
                         : "Mostrar contraseña"
                     }
                   >
-                    {mostrarConfirmacion ? <FaEyeSlash /> : <FaEye />}
+                    {mostrarConfirmacion ? (
+                      <FaEyeSlash />
+                    ) : (
+                      <FaEye />
+                    )}
                   </button>
                 </div>
               </div>
+            </div>
 
-              {error && (
-                <div className={styles.errorMessage}>
-                  {error}
-                </div>
-              )}
-
-              {exito && (
-                <div className={styles.successMessage}>
-                  <FaCheckCircle />
-                  {exito}
-                </div>
-              )}
-
-              <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.cancelButton}
-                  onClick={() => router.push("/perfil")}
-                  disabled={guardando}
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  type="submit"
-                  className={styles.saveButton}
-                  disabled={guardando || Boolean(exito)}
-                >
-                  {guardando
-                    ? "Guardando..."
-                    : "Actualizar contraseña"}
-                </button>
+            {error && (
+              <div className={styles.error}>
+                {error}
               </div>
-            </form>
-          </section>
+            )}
+
+            {exito && (
+              <div className={styles.success}>
+                {exito}
+              </div>
+            )}
+
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={
+                  styles.cancelButton
+                }
+                onClick={() =>
+                  router.push("/perfil")
+                }
+                disabled={guardando}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                className={
+                  styles.saveButton
+                }
+                disabled={guardando}
+              >
+                {guardando
+                  ? "Guardando..."
+                  : "Cambiar contraseña"}
+              </button>
+            </div>
+          </form>
         </main>
       </div>
     </ProtectedRoute>

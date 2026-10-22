@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({
   children,
-  rolPermitido = "admin",
+  rolPermitido = "Administrador",
 }: ProtectedRouteProps) {
   const { usuario, cargando } = useAuth();
   const router = useRouter();
@@ -26,12 +26,16 @@ export default function ProtectedRoute({
       return;
     }
 
-    if (usuario.rol !== rolPermitido) {
+    const rolUsuario = usuario.rol?.toLowerCase();
+    const rolRequerido = rolPermitido.toLowerCase();
+    const estadoUsuario = usuario.estado?.toLowerCase();
+
+    if (rolUsuario !== rolRequerido) {
       router.replace("/login");
       return;
     }
 
-    if (usuario.estado !== "activo") {
+    if (estadoUsuario !== "activo") {
       router.replace("/login");
     }
   }, [usuario, cargando, rolPermitido, router]);
@@ -40,10 +44,17 @@ export default function ProtectedRoute({
     return <p>Cargando...</p>;
   }
 
+  if (!usuario) {
+    return null;
+  }
+
+  const rolUsuario = usuario.rol?.toLowerCase();
+  const rolRequerido = rolPermitido.toLowerCase();
+  const estadoUsuario = usuario.estado?.toLowerCase();
+
   if (
-    !usuario ||
-    usuario.rol !== rolPermitido ||
-    usuario.estado !== "activo"
+    rolUsuario !== rolRequerido ||
+    estadoUsuario !== "activo"
   ) {
     return null;
   }

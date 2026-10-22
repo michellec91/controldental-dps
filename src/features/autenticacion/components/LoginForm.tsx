@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./LoginForm.module.css";
-import { obtenerUsuarioPorCorreo } from "../../../services/usuariosService";
+import { loginUsuario } from "../../../services/usuariosService";
 import { useAuth } from "../../../context/AuthContext";
 
 export default function LoginForm() {
@@ -29,37 +29,47 @@ export default function LoginForm() {
     try {
       setCargando(true);
 
-      const usuario = await obtenerUsuarioPorCorreo(correo.trim());
+      // El backend valida correo + contraseña con bcrypt.
+      const usuario = await loginUsuario(
+        correo.trim(),
+        contrasena
+      );
 
-      if (!usuario || usuario.contrasena !== contrasena) {
-        setError("Correo electrónico o contraseña incorrectos.");
-        return;
-      }
-
-      if (usuario.rol !== "admin") {
+      // Esta página es exclusivamente administrativa.
+      if (usuario.rol.toLowerCase() !== "administrador") {
         setError("Esta cuenta no tiene permisos administrativos.");
         return;
       }
 
-      if (usuario.estado !== "activo") {
+      // Aunque el backend ya lo comprueba,
+      // también lo validamos en el frontend.
+      if (usuario.estado.toLowerCase() !== "activo") {
         setError("Esta cuenta no se encuentra activa.");
         return;
       }
 
+      // Adaptamos los nombres de la BD a los que usa AuthContext.
       iniciarSesion({
-        id: usuario.id,
+        id: String(usuario.id_usuario),
         nombre: usuario.nombre,
+        apellido: usuario.apellido,
         correo: usuario.correo,
+        telefono: usuario.telefono,
         rol: usuario.rol,
         estado: usuario.estado,
-        imagenPerfil: usuario.imagenPerfil,
+        imagenPerfil:
+          usuario.imagen_perfil || undefined,
       });
-      
+
       router.push("/dashboard");
-    } catch {
-      setError(
-        "No fue posible conectar con el servidor. Verifica que la API esté activa."
-      );
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(
+          "No fue posible conectar con el servidor. Verifica que la API esté activa."
+        );
+      }
     } finally {
       setCargando(false);
     }

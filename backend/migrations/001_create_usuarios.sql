@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS usuarios (
+  id_usuario INT NOT NULL AUTO_INCREMENT,
+  nombre VARCHAR(100) NOT NULL,
+  apellido VARCHAR(100) NOT NULL,
+  correo VARCHAR(150) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  telefono VARCHAR(50) NOT NULL,
+  rol VARCHAR(50) NOT NULL,
+  estado VARCHAR(50) NOT NULL,
+  imagen_perfil VARCHAR(255) NULL,
+  fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id_usuario),
+  UNIQUE (correo)
+);

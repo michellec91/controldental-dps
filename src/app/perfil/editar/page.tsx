@@ -2,7 +2,12 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaArrowLeft, FaEnvelope, FaPhone, FaUser } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaEnvelope,
+  FaPhone,
+  FaUser,
+} from "react-icons/fa";
 
 import Navbar from "../../../components/Navbar";
 import ProtectedRoute from "../../../features/autenticacion/components/ProtectedRoute";
@@ -10,15 +15,8 @@ import { useAuth } from "../../../context/AuthContext";
 import styles from "./page.module.css";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
-interface DatosUsuario {
-  nombre: string;
-  apellido?: string;
-  correo: string;
-  telefono?: string;
-  direccion?: string;
-}
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:3001";
 
 export default function EditarPerfilPage() {
   const { usuario, actualizarUsuarioSesion } = useAuth();
@@ -28,44 +26,23 @@ export default function EditarPerfilPage() {
   const [apellido, setApellido] = useState("");
   const [correo, setCorreo] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
 
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
   const [exito, setExito] = useState("");
 
   useEffect(() => {
-  if (!usuario) return;
+    if (!usuario) return;
 
-  const usuarioActual = usuario;
+    setNombre(usuario.nombre || "");
+    setApellido(usuario.apellido || "");
+    setCorreo(usuario.correo || "");
+    setTelefono(usuario.telefono || "");
+  }, [usuario]);
 
-  async function cargarDatos() {
-    try {
-      const respuesta = await fetch(
-        `${API_URL}/usuarios/${usuarioActual.id}`
-      );
-
-      if (!respuesta.ok) {
-        throw new Error();
-      }
-
-      const datos: DatosUsuario = await respuesta.json();
-
-      setNombre(datos.nombre ?? "");
-      setApellido(datos.apellido ?? "");
-      setCorreo(datos.correo ?? "");
-      setTelefono(datos.telefono ?? "");
-      setDireccion(datos.direccion ?? "");
-    } catch {
-      setNombre(usuarioActual.nombre);
-      setCorreo(usuarioActual.correo);
-    }
-  }
-
-  cargarDatos();
-}, [usuario]);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     setError("");
@@ -76,49 +53,21 @@ export default function EditarPerfilPage() {
       return;
     }
 
-    if (!nombre.trim() || !correo.trim()) {
-      setError("El nombre y el correo electrónico son obligatorios.");
+    if (
+      !nombre.trim() ||
+      !apellido.trim() ||
+      !correo.trim() ||
+      !telefono.trim()
+    ) {
+      setError(
+        "Nombre, apellido, correo y teléfono son obligatorios."
+      );
       return;
     }
 
     try {
       setGuardando(true);
 
-      const respuestaActual = await fetch(
-        `${API_URL}/usuarios/${usuario.id}`,
-      );
-          if (!respuestaActual.ok){
-            throw new Error();
-          }
-      
-      const usuarioActualizado = await respuestaActual.json();
-
-      //Actualiza los campos obligatorios
-      usuarioActualizado.nombre = nombre.trim();
-      usuarioActualizado.correo = correo.trim();
-        
-      //Guarda el apellido, elimina si se borra
-      if (apellido.trim()) {
-        usuarioActualizado.apellido = apellido.trim();
-      } else {
-        delete usuarioActualizado.apellido;
-      }
-
-      //Guarda telefono y lo elimina si se borra
-      if(telefono.trim()) {
-        usuarioActualizado.telefono = telefono.trim();
-      } else {
-        delete usuarioActualizado.telefono;
-      }
-
-      //Guarda la direccion y lo elimina si se borra
-      if(direccion.trim()) {
-        usuarioActualizado.direccion = direccion.trim();
-      } else {
-        delete usuarioActualizado.direccion;
-      }
-
-      //Guarda el usuario completo actualizado
       const respuesta = await fetch(
         `${API_URL}/usuarios/${usuario.id}`,
         {
@@ -126,31 +75,46 @@ export default function EditarPerfilPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(usuarioActualizado),
+          body: JSON.stringify({
+            nombre: nombre.trim(),
+            apellido: apellido.trim(),
+            correo: correo.trim(),
+            telefono: telefono.trim(),
+          }),
         }
       );
 
+      const data = await respuesta.json();
+
       if (!respuesta.ok) {
-        throw new Error();        
+        throw new Error(
+          data.error ||
+            "No fue posible actualizar la información."
+        );
       }
 
-      //Actualiza también la sesión actual
       actualizarUsuarioSesion({
         nombre: nombre.trim(),
-        apellido: apellido.trim() || undefined,
+        apellido: apellido.trim(),
         correo: correo.trim(),
-        telefono: telefono.trim() || undefined,
+        telefono: telefono.trim(),
       });
 
-      setExito("La información se actualizó correctamente.");
+      setExito(
+        "La información se actualizó correctamente."
+      );
 
       setTimeout(() => {
         router.push("/perfil");
       }, 1200);
-    } catch {
-      setError(
-        "No fue posible actualizar la información. Verifica que la API esté activa."
-      );
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(
+          "No fue posible actualizar la información."
+        );
+      }
     } finally {
       setGuardando(false);
     }
@@ -173,12 +137,17 @@ export default function EditarPerfilPage() {
 
           <header className={styles.header}>
             <h1>Editar perfil</h1>
+
             <p>
-              Actualiza la información de tu cuenta administrativa.
+              Actualiza la información de tu cuenta
+              administrativa.
             </p>
           </header>
 
-          <form className={styles.card} onSubmit={handleSubmit}>
+          <form
+            className={styles.card}
+            onSubmit={handleSubmit}
+          >
             <div className={styles.sectionHeader}>
               <div>
                 <span>Cuenta administrativa</span>
@@ -188,74 +157,88 @@ export default function EditarPerfilPage() {
 
             <div className={styles.formGrid}>
               <div className={styles.field}>
-                <label htmlFor="nombre">Nombre</label>
+                <label htmlFor="nombre">
+                  Nombre
+                </label>
 
-                <div className={styles.inputContainer}>
+                <div
+                  className={styles.inputContainer}
+                >
                   <FaUser />
+
                   <input
                     id="nombre"
                     value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
+                    onChange={(e) =>
+                      setNombre(e.target.value)
+                    }
                     placeholder="Nombre"
                   />
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="apellido">Apellido</label>
+                <label htmlFor="apellido">
+                  Apellido
+                </label>
 
-                <div className={styles.inputContainer}>
+                <div
+                  className={styles.inputContainer}
+                >
                   <FaUser />
+
                   <input
                     id="apellido"
                     value={apellido}
-                    onChange={(e) => setApellido(e.target.value)}
+                    onChange={(e) =>
+                      setApellido(e.target.value)
+                    }
                     placeholder="Apellido"
                   />
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="correo">Correo electrónico</label>
+                <label htmlFor="correo">
+                  Correo electrónico
+                </label>
 
-                <div className={styles.inputContainer}>
+                <div
+                  className={styles.inputContainer}
+                >
                   <FaEnvelope />
+
                   <input
                     id="correo"
                     type="email"
                     value={correo}
-                    onChange={(e) => setCorreo(e.target.value)}
+                    onChange={(e) =>
+                      setCorreo(e.target.value)
+                    }
                     placeholder="correo@ejemplo.com"
                   />
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="telefono">Teléfono</label>
+                <label htmlFor="telefono">
+                  Teléfono
+                </label>
 
-                <div className={styles.inputContainer}>
+                <div
+                  className={styles.inputContainer}
+                >
                   <FaPhone />
+
                   <input
                     id="telefono"
                     value={telefono}
-                    onChange={(e) => setTelefono(e.target.value)}
+                    onChange={(e) =>
+                      setTelefono(e.target.value)
+                    }
                     placeholder="0000-0000"
                   />
                 </div>
-              </div>
-
-              <div className={`${styles.field} ${styles.fullWidth}`}>
-                <label htmlFor="direccion">
-                  Dirección / información de contacto
-                </label>
-
-                <textarea
-                  id="direccion"
-                  value={direccion}
-                  onChange={(e) => setDireccion(e.target.value)}
-                  placeholder="Ingresa información adicional de contacto"
-                  rows={4}
-                />
               </div>
             </div>
 
@@ -275,7 +258,9 @@ export default function EditarPerfilPage() {
               <button
                 type="button"
                 className={styles.cancelButton}
-                onClick={() => router.push("/perfil")}
+                onClick={() =>
+                  router.push("/perfil")
+                }
                 disabled={guardando}
               >
                 Cancelar
@@ -286,7 +271,9 @@ export default function EditarPerfilPage() {
                 className={styles.saveButton}
                 disabled={guardando}
               >
-                {guardando ? "Guardando..." : "Guardar cambios"}
+                {guardando
+                  ? "Guardando..."
+                  : "Guardar cambios"}
               </button>
             </div>
           </form>
