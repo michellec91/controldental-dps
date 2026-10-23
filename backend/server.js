@@ -10,6 +10,7 @@ const app = express();
 const originsPermitidos = [
   "http://localhost:3000",
   "http://localhost:8081",
+  "http://localhost:3001",
 ];
 
 app.use(
@@ -148,7 +149,7 @@ app.use(
 // -----------------------------------------
 const PORT =
   process.env.PORT ||
-  3001;
+  3000;
 
 app.listen(PORT, () => {
   console.log(
