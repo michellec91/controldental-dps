@@ -213,7 +213,6 @@ router.post("/firebase-sync", async (req, res) => {
            telefono,
            rol,
            estado,
-           imagen_perfil
          )
          VALUES (?, ?, ?, ?, ?, 'Paciente', 'Activo')`,
         [
@@ -221,7 +220,7 @@ router.post("/firebase-sync", async (req, res) => {
           apellido,
           correo,
           password,
-          telefono,
+          telefono
         ]
       );
 
@@ -247,6 +246,7 @@ router.post("/firebase-sync", async (req, res) => {
           telefono,
           rol: "Paciente",
           estado: "Activo",
+          imagen_perfil: null,
         },
       });
 
