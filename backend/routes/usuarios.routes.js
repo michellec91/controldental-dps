@@ -212,7 +212,7 @@ router.post("/firebase-sync", async (req, res) => {
            password,
            telefono,
            rol,
-           estado,
+           estado
          )
          VALUES (?, ?, ?, ?, ?, 'Paciente', 'Activo')`,
         [
