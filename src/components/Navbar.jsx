@@ -258,7 +258,7 @@ export default function Navbar() {
                                             >
                                                 <FaUser
                                                     size={14}
-                                                    className="text-gray-400"
+                                                    className="text-[var(--text-secondary)]"
                                                 />
 
                                                 <span>
@@ -275,7 +275,7 @@ export default function Navbar() {
                                             >
                                                 <FaLock
                                                     size={14}
-                                                    className="text-gray-400"
+                                                    className="text-[var(--text-secondary)]"
                                                 />
 
                                                 <span>

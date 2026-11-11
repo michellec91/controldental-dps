@@ -178,17 +178,14 @@ export default function CambiarPasswordPage() {
             className={styles.card}
             onSubmit={handleSubmit}
           >
-            <div
-              className={styles.sectionHeader}
-            >
-              <div>
-                <span>
-                  Seguridad de la cuenta
-                </span>
+            <div className={styles.sectionHeader}>
+              <div className={styles.lockIcon}>
+                <FaLock />
+              </div>
 
-                <h2>
-                  Actualizar contraseña
-                </h2>
+              <div className={styles.headerText}>
+                <h2>Seguridad de la cuenta</h2>
+                <p>Actualiza tu contraseña para mantener tu cuenta protegida.</p>
               </div>
             </div>
 
@@ -204,7 +201,7 @@ export default function CambiarPasswordPage() {
                     styles.inputContainer
                   }
                 >
-                  <FaLock />
+                  <FaLock className={styles.inputIcon} />
 
                   <input
                     id="actual"
@@ -227,10 +224,9 @@ export default function CambiarPasswordPage() {
 
                   <button
                     type="button"
+                    className={styles.eyeButton}
                     onClick={() =>
-                      setMostrarActual(
-                        (valor) => !valor
-                      )
+                      setMostrarActual((valor) => !valor)
                     }
                     aria-label={
                       mostrarActual
@@ -238,11 +234,7 @@ export default function CambiarPasswordPage() {
                         : "Mostrar contraseña"
                     }
                   >
-                    {mostrarActual ? (
-                      <FaEyeSlash />
-                    ) : (
-                      <FaEye />
-                    )}
+                    {mostrarActual ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
               </div>
@@ -258,7 +250,7 @@ export default function CambiarPasswordPage() {
                     styles.inputContainer
                   }
                 >
-                  <FaLock />
+                  <FaLock className={styles.inputIcon} />
 
                   <input
                     id="nueva"
@@ -281,10 +273,9 @@ export default function CambiarPasswordPage() {
 
                   <button
                     type="button"
+                    className={styles.eyeButton}
                     onClick={() =>
-                      setMostrarNueva(
-                        (valor) => !valor
-                      )
+                      setMostrarNueva((valor) => !valor)
                     }
                     aria-label={
                       mostrarNueva
@@ -292,11 +283,7 @@ export default function CambiarPasswordPage() {
                         : "Mostrar contraseña"
                     }
                   >
-                    {mostrarNueva ? (
-                      <FaEyeSlash />
-                    ) : (
-                      <FaEye />
-                    )}
+                    {mostrarNueva ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
               </div>
@@ -312,7 +299,7 @@ export default function CambiarPasswordPage() {
                     styles.inputContainer
                   }
                 >
-                  <FaLock />
+                  <FaLock className={styles.inputIcon} />
 
                   <input
                     id="confirmar"
@@ -335,10 +322,9 @@ export default function CambiarPasswordPage() {
 
                   <button
                     type="button"
+                    className={styles.eyeButton}
                     onClick={() =>
-                      setMostrarConfirmacion(
-                        (valor) => !valor
-                      )
+                      setMostrarConfirmacion((valor) => !valor)
                     }
                     aria-label={
                       mostrarConfirmacion
@@ -346,11 +332,7 @@ export default function CambiarPasswordPage() {
                         : "Mostrar contraseña"
                     }
                   >
-                    {mostrarConfirmacion ? (
-                      <FaEyeSlash />
-                    ) : (
-                      <FaEye />
-                    )}
+                    {mostrarConfirmacion ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
               </div>
