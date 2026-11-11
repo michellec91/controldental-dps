@@ -227,12 +227,12 @@ export default function AgendaView() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-gray-50 p-6">
+      <main className="min-h-screen bg-[var(--background)] text-[var(--text)] p-6 transition-colors">
         <div className="mx-auto flex max-w-7xl gap-6 flex-col md:flex-row">
 
           {/* PANEL IZQUIERDO */}
           <aside className="w-full md:w-64 space-y-6">
-            <h1 className="text-3xl font-extrabold text-gray-800">
+            <h1 className="text-3xl font-extrabold text-[var(--text)]">
               AGENDA ADMIN
             </h1>
 
@@ -247,12 +247,21 @@ export default function AgendaView() {
             />
 
             {/* LEYENDA */}
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
-
+            <div
+              className="
+                rounded-xl
+                border
+                border-[var(--border)]
+                bg-[var(--surface)]
+                p-4
+                shadow-sm
+                space-y-3
+              "
+            >
               <div className="flex items-center gap-3">
                 <span className="h-4 w-4 rounded-full bg-yellow-500" />
 
-                <span className="font-bold text-gray-700 text-xs">
+                <span className="font-bold text-[var(--text)] text-xs">
                   PENDIENTES
                 </span>
               </div>
@@ -260,7 +269,7 @@ export default function AgendaView() {
               <div className="flex items-center gap-3">
                 <span className="h-4 w-4 rounded-full bg-blue-500" />
 
-                <span className="font-bold text-gray-700 text-xs">
+                <span className="font-bold text-[var(--text)] text-xs">
                   CONFIRMADAS
                 </span>
               </div>
@@ -268,7 +277,7 @@ export default function AgendaView() {
               <div className="flex items-center gap-3">
                 <span className="h-4 w-4 rounded-full bg-green-600" />
 
-                <span className="font-bold text-gray-700 text-xs">
+                <span className="font-bold text-[var(--text)] text-xs">
                   COMPLETADAS
                 </span>
               </div>
@@ -276,7 +285,7 @@ export default function AgendaView() {
               <div className="flex items-center gap-3">
                 <span className="h-4 w-4 rounded-full bg-green-500" />
 
-                <span className="font-bold text-gray-700 text-xs">
+                <span className="font-bold text-[var(--text)] text-xs">
                   DISPONIBLES
                 </span>
               </div>
@@ -287,34 +296,118 @@ export default function AgendaView() {
           <div className="flex-1 space-y-4">
 
             {/* NAVEGACIÓN */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div
+              className="
+                flex
+                flex-col
+                sm:flex-row
+                items-center
+                justify-between
+                gap-3
 
+                rounded-xl
+
+                border
+                border-[var(--border)]
+
+                bg-[var(--surface)]
+
+                p-4
+                shadow-sm
+              "
+            >
+              {/* SEMANA ANTERIOR */}
               <button
                 type="button"
                 onClick={
                   irSemanaAnterior
                 }
-                className="w-full sm:w-auto rounded-lg bg-gray-100 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-200 transition-colors"
+                className="
+                  w-full
+                  sm:w-auto
+
+                  rounded-lg
+
+                  border
+                  border-[var(--border)]
+
+                  bg-[var(--surface-soft)]
+
+                  px-4
+                  py-2
+
+                  text-xs
+                  font-bold
+                  text-[var(--text)]
+
+                  hover:bg-[var(--surface-hover)]
+
+                  transition-colors
+                "
               >
                 ← Semana Anterior
               </button>
 
+              {/* ESTA SEMANA */}
               <button
                 type="button"
                 onClick={
                   irAHoy
                 }
-                className="w-full sm:w-auto rounded-lg bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 hover:bg-blue-100 border border-blue-200 transition-colors"
+                className="
+                  w-full
+                  sm:w-auto
+
+                  rounded-lg
+
+                  bg-[var(--primary-soft)]
+
+                  px-4
+                  py-2
+
+                  text-xs
+                  font-bold
+                  text-[var(--primary)]
+
+                  hover:bg-[var(--surface-hover)]
+
+                  border
+                  border-[var(--primary)]
+
+                  transition-colors
+                "
               >
                 Esta Semana
               </button>
 
+              {/* SEMANA SIGUIENTE */}
               <button
                 type="button"
                 onClick={
                   irSemanaSiguiente
                 }
-                className="w-full sm:w-auto rounded-lg bg-gray-100 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-200 transition-colors"
+                className="
+                  w-full
+                  sm:w-auto
+
+                  rounded-lg
+
+                  border
+                  border-[var(--border)]
+
+                  bg-[var(--surface-soft)]
+
+                  px-4
+                  py-2
+
+                  text-xs
+                  font-bold
+                  text-[var(--text)]
+
+                  hover:bg-[var(--surface-hover)]
+
+                  transition-colors
+                "
               >
                 Semana Siguiente →
               </button>
@@ -322,15 +415,47 @@ export default function AgendaView() {
 
             {/* CARGANDO */}
             {cargando ? (
-              <div className="rounded-xl border border-gray-200 bg-white p-12 text-center text-gray-500">
+              <div
+                className="
+                  rounded-xl
+
+                  border
+                  border-[var(--border)]
+
+                  bg-[var(--surface)]
+
+                  p-12
+
+                  text-center
+                  text-[var(--text-secondary)]
+                "
+              >
                 Cargando agenda...
               </div>
+
             ) : error ? (
+
               /* ERROR */
-              <div className="rounded-xl border border-red-200 bg-red-50 p-12 text-center text-red-600">
+              <div
+                className="
+                  rounded-xl
+
+                  border
+                  border-red-500/30
+
+                  bg-red-500/10
+
+                  p-12
+
+                  text-center
+                  text-red-400
+                "
+              >
                 {error}
               </div>
+
             ) : (
+
               /* CALENDARIO */
               <AgendaCalendarGrid
                 citas={citas}

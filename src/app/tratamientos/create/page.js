@@ -154,13 +154,13 @@ const Create = () => {
 
   const inputClass = (field) => {
     const base =
-      "w-full px-3.5 py-2.5 border rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow";
+      "w-full px-3.5 py-2.5 border rounded-lg text-sm text-[var(--text)] bg-[var(--input)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 transition-colors";
 
     if (errors[field]) {
       return `${base} border-red-500 focus:ring-red-500 focus:border-red-500`;
     }
 
-    return `${base} border-gray-300 focus:ring-blue-500 focus:border-blue-500`;
+    return `${base} border-[var(--border)] focus:ring-[var(--primary)] focus:border-[var(--primary)]`;
   };
 
   // -----------------------------------------
@@ -352,15 +352,15 @@ const Create = () => {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-[var(--background)] text-[var(--text)]">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8">
+          <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] shadow-sm p-6 sm:p-8">
             <div className="mb-6">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text)]">
                 Crear Tratamiento
               </h1>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-[var(--text-secondary)] mt-1">
                 Completa la información del
                 nuevo tratamiento
               </p>
@@ -374,7 +374,7 @@ const Create = () => {
               <div>
                 <label
                   htmlFor="nombre"
-                  className="block text-sm font-medium text-gray-700 mb-1.5"
+                  className="block text-sm font-medium text-[var(--text)] mb-1.5"
                 >
                   Nombre{" "}
                   <span className="text-red-500">
@@ -425,7 +425,7 @@ const Create = () => {
               <div>
                 <label
                   htmlFor="descripcion"
-                  className="block text-sm font-medium text-gray-700 mb-1.5"
+                  className="block text-sm font-medium text-[var(--text)] mb-1.5"
                 >
                   Descripción{" "}
                   <span className="text-red-500">
@@ -478,7 +478,7 @@ const Create = () => {
                     <span />
                   )}
 
-                  <p className="text-xs text-gray-400 shrink-0">
+                  <p className="text-xs text-[var(--text-secondary)] shrink-0">
                     {
                       descripcion.length
                     }
@@ -492,7 +492,7 @@ const Create = () => {
                 <div>
                   <label
                     htmlFor="precio"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="block text-sm font-medium text-[var(--text)] mb-1.5"
                   >
                     Precio{" "}
                     <span className="text-red-500">
@@ -501,7 +501,7 @@ const Create = () => {
                   </label>
 
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] text-sm">
                       $
                     </span>
 
@@ -566,7 +566,7 @@ const Create = () => {
                 <div>
                   <label
                     htmlFor="duracion"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="block text-sm font-medium text-[var(--text)] mb-1.5"
                   >
                     Duración (minutos){" "}
                     <span className="text-red-500">
@@ -621,14 +621,14 @@ const Create = () => {
 
               {/* IMAGEN */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">
                   Imagen del tratamiento
                 </label>
 
                 <div className="flex items-center gap-3">
                   <label
                     htmlFor="file"
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text)] bg-[var(--surface-soft)] hover:bg-[var(--surface-hover)] cursor-pointer transition-colors"
                   >
                     <FaUpload
                       size={12}
@@ -643,7 +643,7 @@ const Create = () => {
 
                   {file ? (
                     <>
-                      <span className="text-sm text-gray-500 truncate max-w-[200px]">
+                      <span className="text-sm text-[var(--text-secondary)] truncate max-w-[200px]">
                         {file.name}
                       </span>
 
@@ -665,7 +665,7 @@ const Create = () => {
                       </button>
                     </>
                   ) : (
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-[var(--text-secondary)]">
                       Ningún archivo
                       seleccionado
                     </span>
@@ -682,7 +682,7 @@ const Create = () => {
                   />
                 </div>
 
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-[var(--text-secondary)] mt-2">
                   Imagen opcional.
                   Tamaño máximo: 4 MB.
                 </p>
@@ -700,7 +700,7 @@ const Create = () => {
                   disabled={
                     uploading
                   }
-                  className="w-full sm:w-auto px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--primary)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-dark)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Cancelar
                 </button>

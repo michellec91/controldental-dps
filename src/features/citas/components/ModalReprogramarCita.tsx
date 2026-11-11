@@ -1,6 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useRef,
+  useState,
+} from "react";
+
+import { FaRegCalendarAlt } from "react-icons/fa";
+
+import { FaChevronDown } from "react-icons/fa";
 
 import { Cita } from "../../../services/citasService";
 
@@ -251,26 +258,87 @@ export function ModalReprogramarCita({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          Reprogramar Cita
-        </h2>
+  const fechaInputRef =
+  useRef<HTMLInputElement>(
+    null
+  );
 
+  const abrirCalendario = () => {
+    fechaInputRef.current?.showPicker?.();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
+      <div
+        className="
+          w-full
+          max-w-md
+
+          rounded-2xl
+
+          bg-[var(--surface)]
+
+          border
+          border-[var(--border)]
+
+          p-6
+
+          shadow-2xl
+
+          text-[var(--text)]
+        "
+      >
+        {/* CABECERA */}
+        <div
+          className="
+            mb-5
+
+            border-b
+            border-[var(--border)]
+
+            pb-4
+          "
+        >
+          <h2 className="text-xl font-bold text-[var(--text)]">
+            Reprogramar Cita
+          </h2>
+
+          <p className="mt-1 text-xs text-[var(--text-secondary)]">
+            Selecciona una nueva fecha y hora para la cita.
+          </p>
+        </div>
+
+        {/* ERROR */}
         {error && (
-          <div className="mb-4 rounded-lg bg-red-100 p-3 text-xs font-semibold text-red-700 border border-red-300">
+          <div
+            className="
+              mb-4
+
+              rounded-lg
+
+              bg-red-500/10
+
+              p-3
+
+              text-xs
+              font-semibold
+              text-red-400
+
+              border
+              border-red-500/30
+            "
+          >
             {error}
           </div>
         )}
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-4"
+          className="space-y-5"
         >
           {/* TRATAMIENTO */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-[var(--text)] mb-2">
               Tratamiento
             </label>
 
@@ -280,70 +348,194 @@ export function ModalReprogramarCita({
                 cita.tratamiento_nombre
               }
               disabled
-              className="w-full rounded-lg border border-gray-200 bg-gray-100 p-2 text-sm text-gray-600"
+              className="
+                w-full
+
+                rounded-lg
+
+                border
+                border-[var(--border)]
+
+                bg-[var(--surface-soft)]
+
+                p-2.5
+
+                text-sm
+                text-[var(--text-secondary)]
+
+                opacity-80
+              "
             />
           </div>
 
           {/* FECHA */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-[var(--text)] mb-2">
               Nueva Fecha
             </label>
 
-            <input
-              type="date"
-              value={
-                nuevaFecha
-              }
-              onChange={(e) =>
-                setNuevaFecha(
-                  e.target.value
-                )
-              }
-              className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              required
-            />
+            <div className="relative">
+              <input
+                ref={fechaInputRef}
+                type="date"
+                value={nuevaFecha}
+                onChange={(e) =>
+                  setNuevaFecha(
+                    e.target.value
+                  )
+                }
+                className="
+                  theme-date-input
+
+                  w-full
+
+                  rounded-lg
+
+                  border
+                  border-[var(--border)]
+
+                  bg-[var(--input)]
+
+                  py-2.5
+                  pl-3
+                  pr-11
+
+                  text-sm
+                  text-[var(--text)]
+
+                  outline-none
+
+                  focus:border-[var(--primary)]
+                  focus:ring-2
+                  focus:ring-[var(--primary)]
+
+                  transition-colors
+                "
+                required
+              />
+
+              <button
+                type="button"
+                onClick={
+                  abrirCalendario
+                }
+                aria-label="Abrir calendario"
+                className="
+                  absolute
+                  right-3
+                  top-1/2
+                  -translate-y-1/2
+
+                  flex
+                  h-8
+                  w-8
+                  items-center
+                  justify-center
+
+                  rounded-lg
+
+                  text-[var(--text-secondary)]
+
+                  hover:bg-[var(--primary-soft)]
+                  hover:text-[var(--primary)]
+
+                  transition-colors
+                "
+              >
+                <FaRegCalendarAlt
+                  size={16}
+                />
+              </button>
+            </div>
           </div>
 
           {/* HORA */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-[var(--text)] mb-2">
               Nueva Hora
             </label>
 
-            <select
-              value={
-                nuevaHora
-              }
-              onChange={(e) =>
-                setNuevaHora(
-                  e.target.value
-                )
-              }
-              className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              required
-            >
-              {horasDisponibles.map(
-                (hora) => (
-                  <option
-                    key={
-                      hora
-                    }
-                    value={
-                      hora
-                    }
-                  >
-                    {formatearHora(
-                      hora
-                    )}
-                  </option>
-                )
-              )}
-            </select>
+            <div className="relative">
+              <select
+                value={nuevaHora}
+                onChange={(e) =>
+                  setNuevaHora(
+                    e.target.value
+                  )
+                }
+                className="
+                  w-full
+
+                  appearance-none
+
+                  rounded-lg
+
+                  border
+                  border-[var(--border)]
+
+                  bg-[var(--input)]
+
+                  py-2.5
+                  pl-3
+                  pr-12
+
+                  text-sm
+                  text-[var(--text)]
+
+                  outline-none
+
+                  focus:border-[var(--primary)]
+                  focus:ring-2
+                  focus:ring-[var(--primary)]
+
+                  transition-colors
+                "
+                required
+              >
+                {horasDisponibles.map(
+                  (hora) => (
+                    <option
+                      key={hora}
+                      value={hora}
+                    >
+                      {formatearHora(
+                        hora
+                      )}
+                    </option>
+                  )
+                )}
+              </select>
+
+              <FaChevronDown
+                className="
+                  pointer-events-none
+
+                  absolute
+                  right-4
+                  top-1/2
+                  -translate-y-1/2
+
+                  text-[var(--text-secondary)]
+                "
+                size={13}
+              />
+            </div>
           </div>
 
           {/* BOTONES */}
-          <div className="flex justify-end gap-3 pt-3">
+          <div
+            className="
+              flex
+              justify-end
+              gap-3
+
+              pt-5
+              mt-2
+
+              border-t
+              border-[var(--border)]
+            "
+          >
             <button
               type="button"
               onClick={
@@ -352,7 +544,28 @@ export function ModalReprogramarCita({
               disabled={
                 guardando
               }
-              className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-300 disabled:opacity-60"
+              className="
+                rounded-lg
+
+                border
+                border-[var(--border)]
+
+                bg-[var(--surface-soft)]
+
+                px-4
+                py-2.5
+
+                text-sm
+                font-semibold
+                text-[var(--text)]
+
+                hover:bg-[var(--surface-hover)]
+
+                disabled:opacity-60
+                disabled:cursor-not-allowed
+
+                transition-colors
+              "
             >
               Cancelar
             </button>
@@ -362,7 +575,29 @@ export function ModalReprogramarCita({
               disabled={
                 guardando
               }
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+              className="
+                rounded-lg
+
+                border
+                border-[var(--primary)]
+
+                bg-[var(--primary)]
+
+                px-4
+                py-2.5
+
+                text-sm
+                font-semibold
+                text-white
+
+                hover:bg-[var(--primary-dark)]
+                hover:border-[var(--primary-dark)]
+
+                disabled:opacity-60
+                disabled:cursor-not-allowed
+
+                transition-colors
+              "
             >
               {guardando
                 ? "Guardando..."

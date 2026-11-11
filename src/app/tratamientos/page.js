@@ -139,86 +139,160 @@ export default function Tratamientos() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-[var(--background)] text-[var(--text)] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
-          {/* Encabezado */}
+          {/* ENCABEZADO */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text)]">
                 Administración de Tratamientos
               </h1>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-[var(--text-secondary)] mt-1">
                 Gestione los tratamientos disponibles en la clínica
               </p>
             </div>
 
             <Link
               href="/tratamientos/create"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors shadow-sm w-full sm:w-auto"
+              className="
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                px-4
+                py-2
+                bg-[var(--primary)]
+                rounded-lg
+                text-white
+                font-medium
+                hover:bg-[var(--primary-dark)]
+                transition-colors
+                shadow-sm
+                w-full
+                sm:w-auto
+              "
             >
               <FaPlus size={14} />
               <span>Añadir Tratamiento</span>
             </Link>
           </div>
 
-          {/* Buscador */}
+          {/* BUSCADOR */}
           <div className="mt-6">
             <div className="relative w-full sm:max-w-sm">
               <FaSearch
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="
+                  absolute
+                  left-3
+                  top-1/2
+                  -translate-y-1/2
+                  text-[var(--text-secondary)]
+                "
                 size={14}
               />
 
               <input
                 type="text"
                 placeholder="Buscar tratamiento..."
-                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
+                className="
+                  w-full
+                  pl-9
+                  pr-3
+                  py-2.5
+
+                  border
+                  border-[var(--border)]
+                  rounded-lg
+
+                  text-sm
+                  text-[var(--text)]
+
+                  bg-[var(--input)]
+
+                  placeholder:text-[var(--text-secondary)]
+
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-[var(--primary)]
+                  focus:border-[var(--primary)]
+
+                  transition-shadow
+                "
                 value={search}
                 onChange={handleSearch}
               />
             </div>
           </div>
 
-          {/* Cantidad */}
-          <p className="mt-4 text-sm text-gray-500">
+          {/* CANTIDAD */}
+          <p className="mt-4 text-sm text-[var(--text-secondary)]">
             {filteredTratamientos.length} tratamiento
             {filteredTratamientos.length !== 1 ? "s" : ""}
             {search && ` para "${search}"`}
           </p>
 
-          {/* Tabla escritorio */}
-          <div className="hidden md:block mt-4 overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+          {/* TABLA ESCRITORIO */}
+          <div
+            className="
+              hidden
+              md:block
+              mt-4
+              overflow-hidden
+
+              rounded-xl
+
+              border
+              border-[var(--border)]
+
+              shadow-sm
+
+              bg-[var(--surface)]
+            "
+          >
             <table className="min-w-full border-collapse">
 
-              <thead className="bg-gray-50">
+              <thead className="bg-[var(--surface-soft)]">
                 <tr>
-                  <th className="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider border border-gray-200">
+                  <th
+                    className="
+                      px-6
+                      py-3
+                      text-start
+                      text-xs
+                      font-semibold
+                      text-[var(--text-secondary)]
+                      uppercase
+                      tracking-wider
+                      border
+                      border-[var(--border)]
+                    "
+                  >
                     Imagen
                   </th>
 
-                  <th className="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider border border-gray-200">
+                  <th className="px-6 py-3 text-start text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider border border-[var(--border)]">
                     Nombre
                   </th>
 
-                  <th className="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider border border-gray-200">
+                  <th className="px-6 py-3 text-start text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider border border-[var(--border)]">
                     Descripción
                   </th>
 
-                  <th className="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider border border-gray-200">
+                  <th className="px-6 py-3 text-start text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider border border-[var(--border)]">
                     Precio
                   </th>
 
-                  <th className="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider border border-gray-200">
+                  <th className="px-6 py-3 text-start text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider border border-[var(--border)]">
                     Duración
                   </th>
 
-                  <th className="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider border border-gray-200">
+                  <th className="px-6 py-3 text-start text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider border border-[var(--border)]">
                     Estado
                   </th>
 
-                  <th className="px-6 py-3 text-end text-xs font-semibold text-gray-600 uppercase tracking-wider border border-gray-200">
+                  <th className="px-6 py-3 text-end text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider border border-[var(--border)]">
                     Acciones
                   </th>
                 </tr>
@@ -229,68 +303,92 @@ export default function Tratamientos() {
                   (tratamiento) => (
                     <tr
                       key={tratamiento.id_tratamiento}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="
+                        bg-[var(--surface)]
+                        hover:bg-[var(--surface-soft)]
+                        transition-colors
+                      "
                     >
 
-                      {/* Imagen */}
-                      <td className="px-6 py-4 border border-gray-200">
+                      {/* IMAGEN */}
+                      <td className="px-6 py-4 border border-[var(--border)]">
                         <img
-                        src={
-                            tratamiento.imagen ||"/images/tratamientos/placeholder.png"
-                        }
-                        alt={tratamiento.nombre}
-                        onError={(e) => {
-                            e.currentTarget.src = "/images/tratamientos/placeholder.png"
-                        }}
-                        className="w-14 h-14 object-cover rounded-lg border border-gray-200 shadow-sm"
+                          src={
+                            tratamiento.imagen ||
+                            "/images/tratamientos/placeholder.png"
+                          }
+                          alt={tratamiento.nombre}
+                          onError={(e) => {
+                            e.currentTarget.src =
+                              "/images/tratamientos/placeholder.png"
+                          }}
+                          className="
+                            w-14
+                            h-14
+                            object-cover
+                            rounded-lg
+                            border
+                            border-[var(--border)]
+                            shadow-sm
+                          "
                         />
                       </td>
 
-                      {/* Nombre */}
-                      <td className="px-6 py-4 text-sm font-medium text-gray-800 border border-gray-200">
+                      {/* NOMBRE */}
+                      <td className="px-6 py-4 text-sm font-medium text-[var(--text)] border border-[var(--border)]">
                         {tratamiento.nombre}
                       </td>
 
-                      {/* Descripción */}
-                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs border border-gray-200">
+                      {/* DESCRIPCIÓN */}
+                      <td className="px-6 py-4 text-sm text-[var(--text-secondary)] max-w-xs border border-[var(--border)]">
                         {tratamiento.descripcion}
                       </td>
 
-                      {/* Precio */}
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-700 border border-gray-200">
+                      {/* PRECIO */}
+                      <td className="px-6 py-4 text-sm font-semibold text-[var(--text)] border border-[var(--border)]">
                         $
                         {Number(
                           tratamiento.precio
                         ).toFixed(2)}
                       </td>
 
-                      {/* Duración */}
-                      <td className="px-6 py-4 text-sm text-gray-500 border border-gray-200">
+                      {/* DURACIÓN */}
+                      <td className="px-6 py-4 text-sm text-[var(--text-secondary)] border border-[var(--border)]">
                         {tratamiento.duracion} min
                       </td>
 
-                      {/* Estado */}
-                      <td className="px-6 py-4 text-sm border border-gray-200">
+                      {/* ESTADO */}
+                      <td className="px-6 py-4 text-sm border border-[var(--border)]">
                         <span
-                          className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${
+                          className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
                             tratamiento.estado === "activo"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-600"
+                              ? "bg-green-500/15 text-green-500"
+                              : "bg-slate-500/15 text-[var(--text-secondary)]"
                           }`}
                         >
                           {tratamiento.estado}
                         </span>
                       </td>
 
-                      {/* Acciones */}
-                      <td className="px-6 py-4 text-end border border-gray-200">
+                      {/* ACCIONES */}
+                      <td className="px-6 py-4 text-end border border-[var(--border)]">
                         <div className="flex justify-end items-center gap-2">
 
                           <Link
                             href={`/tratamientos/${tratamiento.id_tratamiento}?mode=edit`}
                             title="Editar"
                             aria-label="Editar"
-                            className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors shadow-sm"
+                            className="
+                              p-2.5
+                              rounded-full
+
+                              bg-blue-500/15
+                              text-blue-400
+
+                              hover:bg-blue-500/25
+
+                              transition-colors
+                            "
                           >
                             <FaEdit size={14} />
                           </Link>
@@ -304,7 +402,17 @@ export default function Tratamientos() {
                                 tratamiento.id_tratamiento
                               )
                             }
-                            className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors shadow-sm"
+                            className="
+                              p-2.5
+                              rounded-full
+
+                              bg-red-500/15
+                              text-red-400
+
+                              hover:bg-red-500/25
+
+                              transition-colors
+                            "
                           >
                             <FaTrash size={14} />
                           </button>
@@ -320,46 +428,79 @@ export default function Tratamientos() {
             </table>
           </div>
 
-          {/* Vista móvil */}
+          {/* VISTA MÓVIL */}
           <div className="md:hidden mt-4 space-y-3">
 
             {filteredTratamientos.map(
               (tratamiento) => (
                 <div
                   key={tratamiento.id_tratamiento}
-                  className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex gap-4"
+                  className="
+                    bg-[var(--surface)]
+
+                    border
+                    border-[var(--border)]
+
+                    rounded-xl
+
+                    shadow-sm
+
+                    p-4
+
+                    flex
+                    gap-4
+                  "
                 >
 
                   <img
-                    src="/images/tratamientos/placeholder.png"
+                    src={
+                      tratamiento.imagen ||
+                      "/images/tratamientos/placeholder.png"
+                    }
                     alt={tratamiento.nombre}
-                    className="w-20 h-20 object-cover rounded-lg border border-gray-200 shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "/images/tratamientos/placeholder.png"
+                    }}
+                    className="
+                      w-20
+                      h-20
+
+                      object-cover
+
+                      rounded-lg
+
+                      border
+                      border-[var(--border)]
+
+                      shrink-0
+                    "
                   />
 
                   <div className="flex-1 min-w-0">
 
-                    <h3 className="text-base font-semibold text-gray-900 truncate">
+                    <h3 className="text-base font-semibold text-[var(--text)] truncate">
                       {tratamiento.nombre}
                     </h3>
 
-                    <p className="text-sm text-gray-500 line-clamp-2 mt-0.5">
+                    <p className="text-sm text-[var(--text-secondary)] line-clamp-2 mt-0.5">
                       {tratamiento.descripcion}
                     </p>
 
                     <div className="mt-2 flex items-center gap-3 text-sm">
 
-                      <span className="font-semibold text-gray-700">
+                      <span className="font-semibold text-[var(--text)]">
                         $
                         {Number(
                           tratamiento.precio
                         ).toFixed(2)}
                       </span>
 
-                      <span className="text-gray-400">
+                      <span className="text-[var(--text-secondary)]">
                         •
                       </span>
 
-                      <span className="text-gray-500">
+                      <span className="text-[var(--text-secondary)]">
                         {tratamiento.duracion} min
                       </span>
 
@@ -367,10 +508,10 @@ export default function Tratamientos() {
 
                     <div className="mt-2">
                       <span
-                        className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${
+                        className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
                           tratamiento.estado === "activo"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-600"
+                            ? "bg-green-500/15 text-green-500"
+                            : "bg-slate-500/15 text-[var(--text-secondary)]"
                         }`}
                       >
                         {tratamiento.estado}
@@ -381,7 +522,29 @@ export default function Tratamientos() {
 
                       <Link
                         href={`/tratamientos/${tratamiento.id_tratamiento}?mode=edit`}
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 transition-colors"
+                        className="
+                          flex-1
+
+                          inline-flex
+                          items-center
+                          justify-center
+                          gap-2
+
+                          px-3
+                          py-2
+
+                          rounded-lg
+
+                          bg-blue-500/15
+                          text-blue-400
+
+                          text-sm
+                          font-medium
+
+                          hover:bg-blue-500/25
+
+                          transition-colors
+                        "
                       >
                         <FaEdit size={14} />
                         Editar
@@ -394,29 +557,65 @@ export default function Tratamientos() {
                             tratamiento.id_tratamiento
                           )
                         }
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+                        className="
+                          flex-1
+
+                          inline-flex
+                          items-center
+                          justify-center
+                          gap-2
+
+                          px-3
+                          py-2
+
+                          rounded-lg
+
+                          bg-red-500/15
+                          text-red-400
+
+                          text-sm
+                          font-medium
+
+                          hover:bg-red-500/25
+
+                          transition-colors
+                        "
                       >
                         <FaTrash size={14} />
                         Eliminar
                       </button>
 
                     </div>
+
                   </div>
                 </div>
               )
             )}
+
           </div>
 
-          {/* Sin resultados */}
+          {/* SIN RESULTADOS */}
           {filteredTratamientos.length === 0 && (
-            <div className="mt-8 text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+            <div
+              className="
+                mt-8
+                text-center
+                py-12
 
-              <p className="text-gray-500">
+                bg-[var(--surface)]
+
+                rounded-xl
+
+                border
+                border-dashed
+                border-[var(--border)]
+              "
+            >
+              <p className="text-[var(--text-secondary)]">
                 {search
                   ? `No se encontraron tratamientos para "${search}"`
                   : "No hay tratamientos registrados todavía"}
-              </p>
-
+              </p>              
             </div>
           )}
 

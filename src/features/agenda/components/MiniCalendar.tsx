@@ -150,10 +150,21 @@ export function MiniCalendar({
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
+    <div
+      className="
+        rounded-xl
+        border
+        border-[var(--border)]
+        bg-[var(--surface)]
+        p-4
+        shadow-sm
+        space-y-3
+        text-[var(--text)]
+      "
+    >
       {/* MES / AÑO */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-gray-700">
+        <span className="text-xs font-bold text-[var(--text)]">
           {
             mesesNombres[
               mesActual.getMonth()
@@ -170,7 +181,16 @@ export function MiniCalendar({
             onClick={() =>
               cambiarMes(-1)
             }
-            className="rounded p-1 text-xs font-bold text-gray-500 hover:bg-gray-100"
+            className="
+              rounded
+              p-1
+              text-xs
+              font-bold
+              text-[var(--text-secondary)]
+              hover:bg-[var(--surface-hover)]
+              hover:text-[var(--text)]
+              transition-colors
+            "
           >
             ←
           </button>
@@ -180,7 +200,16 @@ export function MiniCalendar({
             onClick={() =>
               cambiarMes(1)
             }
-            className="rounded p-1 text-xs font-bold text-gray-500 hover:bg-gray-100"
+            className="
+              rounded
+              p-1
+              text-xs
+              font-bold
+              text-[var(--text-secondary)]
+              hover:bg-[var(--surface-hover)]
+              hover:text-[var(--text)]
+              transition-colors
+            "
           >
             →
           </button>
@@ -188,7 +217,7 @@ export function MiniCalendar({
       </div>
 
       {/* DÍAS SEMANA */}
-      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400">
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-[var(--text-secondary)]">
         {diasSemana.map(
           (dia, index) => (
             <div
@@ -231,8 +260,7 @@ export function MiniCalendar({
 
             const fechaCeldaStr =
               `${mesActual.getFullYear()}-${mes}-${diaStr}`;
-
-            // Citas activas del día
+              
             const tieneCitas =
               citas.some(
                 (cita) =>
@@ -264,15 +292,15 @@ export function MiniCalendar({
                 }
                 className={`relative rounded-lg py-1 font-semibold transition-colors ${
                   esSeleccionada
-                    ? "bg-blue-600 text-white font-bold"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-[var(--primary)] text-white font-bold"
+                    : "text-[var(--text)] hover:bg-[var(--surface-hover)]"
                 }`}
               >
                 {dia}
 
                 {tieneCitas &&
                   !esSeleccionada && (
-                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-blue-500" />
+                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[var(--primary)]" />
                   )}
               </button>
             );

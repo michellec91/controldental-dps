@@ -192,20 +192,20 @@ export default function SolicitudesList() {
     switch (
       estado.toLowerCase()
     ) {
-      case "pendiente":
-        return "bg-yellow-100 text-yellow-800";
+        case "pendiente":
+        return "bg-yellow-500/15 text-yellow-500 border border-yellow-500/30";
 
       case "confirmada":
-        return "bg-green-100 text-green-800";
+        return "bg-green-500/15 text-green-500 border border-green-500/30";
 
       case "completada":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-500/15 text-blue-400 border border-blue-500/30";
 
       case "cancelada":
-        return "bg-red-100 text-red-800";
+        return "bg-red-500/15 text-red-400 border border-red-500/30";
 
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-500/15 text-[var(--text-secondary)] border border-[var(--border)]";
     }
   }
 
@@ -231,28 +231,51 @@ export default function SolicitudesList() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-[var(--background)] text-[var(--text)] transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text)]">
             Solicitudes de Citas
           </h1>
 
           {/* FILTRO */}
           <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[var(--text)] mb-2">
               Estado
             </label>
 
             <select
-              value={
-                filtroEstado
-              }
+              value={filtroEstado}
               onChange={(e) =>
                 setFiltroEstado(
                   e.target.value
                 )
               }
-              className="w-full sm:w-64 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-sky-500"
+              className="
+                w-full
+                sm:w-64
+
+                rounded-lg
+
+                border
+                border-[var(--border)]
+
+                bg-[var(--input)]
+
+                px-3
+                py-2
+
+                text-sm
+                text-[var(--text)]
+
+                outline-none
+
+                focus:border-[var(--primary)]
+                focus:ring-2
+                focus:ring-[var(--primary)]
+
+                transition-colors
+              "
             >
               <option value="Pendiente">
                 Pendientes
@@ -279,78 +302,108 @@ export default function SolicitudesList() {
           {/* CARGANDO */}
           {cargando ? (
             <div className="flex justify-center items-center py-16">
-              <p className="text-gray-600 text-base font-medium">
-                Cargando
-                solicitudes...
+              <p className="text-[var(--text-secondary)] text-base font-medium">
+                Cargando solicitudes...
               </p>
             </div>
+
           ) : error ? (
-            // ERROR
+
+            /* ERROR */
             <div className="flex justify-center items-center py-16">
-              <p className="text-red-600 text-base font-medium">
+              <p className="text-red-500 text-base font-medium">
                 {error}
               </p>
             </div>
-          ) : citasFiltradas.length ===
-            0 ? (
-            // SIN DATOS
-            <div className="flex justify-center items-center py-16">
-              <p className="text-gray-500 text-base">
-                No hay solicitudes
-                para mostrar.
+
+          ) : citasFiltradas.length === 0 ? (
+
+            /* SIN DATOS */
+            <div
+              className="
+                mt-6
+
+                flex
+                justify-center
+                items-center
+
+                py-16
+
+                bg-[var(--surface)]
+
+                border
+                border-dashed
+                border-[var(--border)]
+
+                rounded-xl
+              "
+            >
+              <p className="text-[var(--text-secondary)] text-base">
+                No hay solicitudes para mostrar.
               </p>
             </div>
+
           ) : (
-            // LISTA
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+
+            /* LISTA */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+
               {citasFiltradas.map(
                 (cita) => (
                   <div
                     key={
                       cita.id_cita
                     }
-                    className="bg-white border border-gray-200 rounded-xl shadow-sm p-4"
+                    className="
+                      bg-[var(--surface)]
+
+                      border
+                      border-[var(--border)]
+
+                      rounded-2xl
+
+                      shadow-sm
+
+                      p-5
+
+                      transition-colors
+                    "
                   >
+
                     {/* ESTADO */}
-                    <div className="mb-4">
+                    <div className="mb-5">
                       <span
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${obtenerEstiloEstado(
                           cita.estado
                         )}`}
                       >
-                        {
-                          cita.estado
-                        }
+                        {cita.estado}
                       </span>
                     </div>
 
                     {/* PACIENTE */}
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-gray-600">
+                      <p className="text-sm font-semibold text-[var(--text-secondary)]">
                         Paciente
                       </p>
 
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-[var(--text)] mt-1">
                         {[
                           cita.paciente_nombre,
                           cita.paciente_apellido,
                         ]
-                          .filter(
-                            Boolean
-                          )
-                          .join(
-                            " "
-                          )}
+                          .filter(Boolean)
+                          .join(" ")}
                       </p>
                     </div>
 
                     {/* TRATAMIENTO */}
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-gray-600">
+                      <p className="text-sm font-semibold text-[var(--text-secondary)]">
                         Tratamiento
                       </p>
 
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-[var(--text)] mt-1">
                         {
                           cita.tratamiento_nombre
                         }
@@ -359,11 +412,11 @@ export default function SolicitudesList() {
 
                     {/* FECHA */}
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-gray-600">
+                      <p className="text-sm font-semibold text-[var(--text-secondary)]">
                         Fecha
                       </p>
 
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-[var(--text)] mt-1">
                         {formatearFecha(
                           cita.fecha
                         )}
@@ -372,11 +425,11 @@ export default function SolicitudesList() {
 
                     {/* HORA */}
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-gray-600">
+                      <p className="text-sm font-semibold text-[var(--text-secondary)]">
                         Hora
                       </p>
 
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-[var(--text)] mt-1">
                         {formatearHora(
                           cita.hora
                         )}
@@ -385,11 +438,11 @@ export default function SolicitudesList() {
 
                     {/* CORREO */}
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-gray-600">
+                      <p className="text-sm font-semibold text-[var(--text-secondary)]">
                         Correo electrónico
                       </p>
 
-                      <p className="text-sm text-gray-900 break-words">
+                      <p className="text-sm text-[var(--text)] mt-1 break-words">
                         {
                           cita.correo ||
                           "-"
@@ -399,11 +452,11 @@ export default function SolicitudesList() {
 
                     {/* TELÉFONO */}
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-gray-600">
+                      <p className="text-sm font-semibold text-[var(--text-secondary)]">
                         Teléfono
                       </p>
 
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-[var(--text)] mt-1">
                         {
                           cita.telefono ||
                           "-"
@@ -414,7 +467,18 @@ export default function SolicitudesList() {
                     {/* ACCIONES */}
                     {cita.estado?.toLowerCase() ===
                       "pendiente" && (
-                      <div className="flex gap-2 mt-6">
+                      <div
+                        className="
+                          flex
+                          gap-3
+
+                          mt-6
+                          pt-4
+
+                          border-t
+                          border-[var(--border)]
+                        "
+                      >
                         <button
                           type="button"
                           onClick={() =>
@@ -422,7 +486,27 @@ export default function SolicitudesList() {
                               cita.id_cita
                             )
                           }
-                          className="px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition-colors"
+                          className="
+                            flex-1
+
+                            px-4
+                            py-2.5
+
+                            rounded-lg
+
+                            bg-green-500/15
+                            text-green-500
+
+                            border
+                            border-green-500/30
+
+                            text-sm
+                            font-semibold
+
+                            hover:bg-green-500/25
+
+                            transition-colors
+                          "
                         >
                           Confirmar
                         </button>
@@ -434,17 +518,40 @@ export default function SolicitudesList() {
                               cita.id_cita
                             )
                           }
-                          className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+                          className="
+                            flex-1
+
+                            px-4
+                            py-2.5
+
+                            rounded-lg
+
+                            bg-red-500/15
+                            text-red-400
+
+                            border
+                            border-red-500/30
+
+                            text-sm
+                            font-semibold
+
+                            hover:bg-red-500/25
+
+                            transition-colors
+                          "
                         >
                           Rechazar
                         </button>
                       </div>
                     )}
+
                   </div>
                 )
               )}
+
             </div>
           )}
+
         </div>
       </main>
     </>

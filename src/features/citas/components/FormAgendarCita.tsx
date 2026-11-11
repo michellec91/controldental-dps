@@ -484,57 +484,65 @@ export function FormAgendarCita({
   // CARGANDO
   // -----------------------------------------
   if (cargando) {
-    return (
-      <div className="py-8 text-center text-sm text-gray-500">
-        Cargando datos...
-      </div>
-    );
-  }
+  return (
+    <div className="py-8 text-center text-sm text-[var(--text-secondary)]">
+      Cargando datos...
+    </div>
+  );
+}
 
   return (
     <form
-      onSubmit={
-        handleSubmit
-      }
-      className="space-y-4"
+      onSubmit={handleSubmit}
+      className="space-y-5"
     >
       {/* PACIENTE */}
       <div>
-        <label className="block text-xs font-bold text-gray-700 mb-1">
+        <label className="block text-xs font-bold text-[var(--text)] mb-2">
           Paciente
         </label>
 
         <select
-          value={
-            idUsuario
-          }
-          onChange={(
-            e
-          ) => {
+          value={idUsuario}
+          onChange={(e) => {
             setIdUsuario(
-              e.target
-                .value
+              e.target.value
             );
 
-            setErrorGeneral(
-              ""
-            );
+            setErrorGeneral("");
           }}
-          className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white"
+          className="
+            w-full
+
+            rounded-lg
+
+            border
+            border-[var(--border)]
+
+            bg-[var(--input)]
+
+            p-2.5
+
+            text-sm
+            text-[var(--text)]
+
+            outline-none
+
+            focus:border-[var(--primary)]
+            focus:ring-2
+            focus:ring-[var(--primary)]
+
+            transition-colors
+          "
           required
         >
-          {usuarios.length ===
-          0 ? (
+          {usuarios.length === 0 ? (
             <option value="">
-              No hay
-              pacientes
-              registrados
+              No hay pacientes registrados
             </option>
           ) : (
             usuarios.map(
-              (
-                usuario
-              ) => (
+              (usuario) => (
                 <option
                   key={
                     usuario.id_usuario
@@ -543,12 +551,8 @@ export function FormAgendarCita({
                     usuario.id_usuario
                   }
                 >
-                  {
-                    usuario.nombre
-                  }{" "}
-                  {
-                    usuario.apellido
-                  }
+                  {usuario.nombre}{" "}
+                  {usuario.apellido}
                 </option>
               )
             )
@@ -558,41 +562,51 @@ export function FormAgendarCita({
 
       {/* TRATAMIENTO */}
       <div>
-        <label className="block text-xs font-bold text-gray-700 mb-1">
+        <label className="block text-xs font-bold text-[var(--text)] mb-2">
           Tratamiento
         </label>
 
         <select
-          value={
-            idTratamiento
-          }
-          onChange={(
-            e
-          ) => {
+          value={idTratamiento}
+          onChange={(e) => {
             setIdTratamiento(
-              e.target
-                .value
+              e.target.value
             );
 
-            setErrorGeneral(
-              ""
-            );
+            setErrorGeneral("");
           }}
-          className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white"
+          className="
+            w-full
+
+            rounded-lg
+
+            border
+            border-[var(--border)]
+
+            bg-[var(--input)]
+
+            p-2.5
+
+            text-sm
+            text-[var(--text)]
+
+            outline-none
+
+            focus:border-[var(--primary)]
+            focus:ring-2
+            focus:ring-[var(--primary)]
+
+            transition-colors
+          "
           required
         >
-          {tratamientos.length ===
-          0 ? (
+          {tratamientos.length === 0 ? (
             <option value="">
-              No hay
-              tratamientos
-              disponibles
+              No hay tratamientos disponibles
             </option>
           ) : (
             tratamientos.map(
-              (
-                tratamiento
-              ) => (
+              (tratamiento) => (
                 <option
                   key={
                     tratamiento.id_tratamiento
@@ -601,9 +615,7 @@ export function FormAgendarCita({
                     tratamiento.id_tratamiento
                   }
                 >
-                  {
-                    tratamiento.nombre
-                  }
+                  {tratamiento.nombre}
                 </option>
               )
             )
@@ -612,61 +624,94 @@ export function FormAgendarCita({
       </div>
 
       {/* FECHA Y HORA */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        {/* FECHA */}
         <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">
+          <label className="block text-xs font-bold text-[var(--text)] mb-2">
             Fecha
           </label>
 
           <input
             type="date"
             min={hoyStr}
-            value={
-              fecha
-            }
-            onChange={(
-              e
-            ) => {
+            value={fecha}
+            onChange={(e) => {
               setFecha(
-                e.target
-                  .value
+                e.target.value
               );
 
-              setErrorGeneral(
-                ""
-              );
+              setErrorGeneral("");
             }}
-            className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none"
+            className="
+              w-full
+
+              rounded-lg
+
+              border
+              border-[var(--border)]
+
+              bg-[var(--input)]
+
+              p-2.5
+
+              text-sm
+              text-[var(--text)]
+
+              outline-none
+
+              focus:border-[var(--primary)]
+              focus:ring-2
+              focus:ring-[var(--primary)]
+
+              transition-colors
+            "
             required
           />
         </div>
 
+        {/* HORA */}
         <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">
+          <label className="block text-xs font-bold text-[var(--text)] mb-2">
             Hora
           </label>
 
           <select
             value={hora}
-            onChange={(
-              e
-            ) => {
+            onChange={(e) => {
               setHora(
-                e.target
-                  .value
+                e.target.value
               );
 
-              setErrorGeneral(
-                ""
-              );
+              setErrorGeneral("");
             }}
-            className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white"
+            className="
+              w-full
+
+              rounded-lg
+
+              border
+              border-[var(--border)]
+
+              bg-[var(--input)]
+
+              p-2.5
+
+              text-sm
+              text-[var(--text)]
+
+              outline-none
+
+              focus:border-[var(--primary)]
+              focus:ring-2
+              focus:ring-[var(--primary)]
+
+              transition-colors
+            "
             required
           >
             {horasDisponibles.map(
-              (
-                horaDisponible
-              ) => (
+              (horaDisponible) => (
                 <option
                   key={
                     horaDisponible
@@ -687,11 +732,23 @@ export function FormAgendarCita({
 
       {/* ERROR */}
       {errorGeneral && (
-        <div className="rounded-lg bg-red-50 p-2.5 text-xs font-semibold text-red-600 border border-red-200">
-          ⚠️{" "}
-          {
-            errorGeneral
-          }
+        <div
+          className="
+            rounded-lg
+
+            bg-red-500/10
+
+            p-3
+
+            text-xs
+            font-semibold
+            text-red-400
+
+            border
+            border-red-500/30
+          "
+        >
+          ⚠️ {errorGeneral}
         </div>
       )}
 
@@ -700,12 +757,29 @@ export function FormAgendarCita({
         type="submit"
         disabled={
           guardando ||
-          usuarios.length ===
-            0 ||
-          tratamientos.length ===
-            0
+          usuarios.length === 0 ||
+          tratamientos.length === 0
         }
-        className="w-full rounded-xl bg-blue-600 py-3 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        className="
+          w-full
+
+          rounded-xl
+
+          bg-[var(--primary)]
+
+          py-3
+
+          text-xs
+          font-bold
+          text-white
+
+          hover:bg-[var(--primary-dark)]
+
+          disabled:opacity-60
+          disabled:cursor-not-allowed
+
+          transition-colors
+        "
       >
         {guardando
           ? "Registrando..."

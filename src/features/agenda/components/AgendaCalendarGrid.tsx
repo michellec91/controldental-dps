@@ -163,11 +163,22 @@ export function AgendaCalendarGrid({
   };
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div
+      className="
+        overflow-x-auto
+        rounded-xl
+        border
+        border-[var(--border)]
+        bg-[var(--surface)]
+        p-4
+        shadow-sm
+        text-[var(--text)]
+      "
+    >
       <div className="grid grid-cols-8 gap-2 min-w-[900px]">
 
         {/* CABECERA HORA */}
-        <div className="p-2 font-bold text-gray-400">
+        <div className="p-2 font-bold text-[var(--text-secondary)]">
           Hora
         </div>
 
@@ -178,13 +189,20 @@ export function AgendaCalendarGrid({
               key={
                 dia.fechaStr
               }
-              className="text-center font-bold text-gray-800 py-2 border-b"
+              className="
+                text-center
+                font-bold
+                text-[var(--text)]
+                py-2
+                border-b
+                border-[var(--border)]
+              "
             >
               <div>
                 {dia.nombre}
               </div>
 
-              <div className="text-sm font-normal text-gray-500">
+              <div className="text-sm font-normal text-[var(--text-secondary)]">
                 {dia.numero}
               </div>
             </div>
@@ -198,7 +216,22 @@ export function AgendaCalendarGrid({
             className="contents"
           >
             {/* HORA */}
-            <div className="flex items-center justify-center font-extrabold text-gray-700 text-xs py-3 border-b">
+            <div
+              className="
+                flex
+                items-center
+                justify-center
+
+                font-extrabold
+                text-[var(--text)]
+                text-xs
+
+                py-3
+
+                border-b
+                border-[var(--border)]
+              "
+            >
               {formatearHora(
                 hora
               )}
@@ -207,9 +240,7 @@ export function AgendaCalendarGrid({
             {/* DÍAS */}
             {diasSemana.map(
               (dia) => {
-                // ---------------------------
                 // DOMINGO
-                // ---------------------------
                 if (
                   dia.nombre ===
                   "DOMINGO"
@@ -217,16 +248,34 @@ export function AgendaCalendarGrid({
                   return (
                     <div
                       key={`${dia.fechaStr}-${hora}`}
-                      className="bg-gray-50 border border-gray-100 rounded-lg p-2 text-[10px] text-gray-400 text-center flex items-center justify-center font-semibold"
+                      className="
+                        bg-[var(--surface-soft)]
+
+                        border
+                        border-[var(--border)]
+
+                        rounded-lg
+
+                        p-2
+
+                        text-[10px]
+                        text-[var(--text-secondary)]
+
+                        text-center
+
+                        flex
+                        items-center
+                        justify-center
+
+                        font-semibold
+                      "
                     >
                       No laborable
                     </div>
                   );
                 }
 
-                // ---------------------------
                 // SÁBADO POR LA TARDE
-                // ---------------------------
                 const esSabadoTarde =
                   dia.nombre ===
                     "SÁBADO" &&
@@ -246,18 +295,34 @@ export function AgendaCalendarGrid({
                   return (
                     <div
                       key={`${dia.fechaStr}-${hora}`}
-                      className="bg-gray-50 border border-gray-100 rounded-lg p-2 text-[10px] text-gray-400 text-center flex items-center justify-center font-semibold"
+                      className="
+                        bg-[var(--surface-soft)]
+
+                        border
+                        border-[var(--border)]
+
+                        rounded-lg
+
+                        p-2
+
+                        text-[10px]
+                        text-[var(--text-secondary)]
+
+                        text-center
+
+                        flex
+                        items-center
+                        justify-center
+
+                        font-semibold
+                      "
                     >
                       Cerrado
                     </div>
                   );
                 }
 
-                // ---------------------------
                 // BUSCAR CITA
-                // Las canceladas NO ocupan
-                // horario.
-                // ---------------------------
                 const cita =
                   citas.find(
                     (c) => {
@@ -285,9 +350,7 @@ export function AgendaCalendarGrid({
                     }
                   );
 
-                // ---------------------------
                 // HAY CITA
-                // ---------------------------
                 if (cita) {
                   const nombrePaciente =
                     [
@@ -339,7 +402,21 @@ export function AgendaCalendarGrid({
                                 cita.id_cita
                               )
                             }
-                            className="opacity-0 group-hover:opacity-100 bg-black/30 hover:bg-black/60 rounded px-1.5 py-0.5 text-[9px] transition-opacity"
+                            className="
+                              opacity-0
+                              group-hover:opacity-100
+
+                              bg-black/30
+                              hover:bg-black/60
+
+                              rounded
+                              px-1.5
+                              py-0.5
+
+                              text-[9px]
+
+                              transition-opacity
+                            "
                             title="Cancelar cita"
                           >
                             ✕
@@ -350,13 +427,32 @@ export function AgendaCalendarGrid({
                   );
                 }
 
-                // ---------------------------
                 // HORARIO DISPONIBLE
-                // ---------------------------
                 return (
                   <div
                     key={`${dia.fechaStr}-${hora}`}
-                    className="rounded-lg bg-green-500 border border-green-600 p-2 flex items-center justify-center text-xs font-extrabold text-white hover:bg-green-600 transition-colors"
+                    className="
+                      rounded-lg
+
+                      bg-green-500
+
+                      border
+                      border-green-600
+
+                      p-2
+
+                      flex
+                      items-center
+                      justify-center
+
+                      text-xs
+                      font-extrabold
+                      text-white
+
+                      hover:bg-green-600
+
+                      transition-colors
+                    "
                   >
                     DISPONIBLE
                   </div>

@@ -20,6 +20,7 @@ import {
   FaTrash,
   FaUpload,
   FaTimes,
+  FaChevronDown,
 } from "react-icons/fa"
 
 const API_URL =
@@ -217,13 +218,13 @@ export default function EditarTratamiento({ params }) {
 
   const inputClass = (field) => {
     const base =
-      "w-full px-3.5 py-2.5 border rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow"
+      "w-full px-3.5 py-2.5 border rounded-lg text-sm text-[var(--text)] bg-[var(--input)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 transition-colors"
 
     if (errors[field]) {
       return `${base} border-red-500 focus:ring-red-500 focus:border-red-500`
     }
 
-    return `${base} border-gray-300 focus:ring-blue-500 focus:border-blue-500`
+    return `${base} border-[var(--border)] focus:ring-[var(--primary)] focus:border-[var(--primary)]`
   }
 
   // =============================================
@@ -552,15 +553,15 @@ export default function EditarTratamiento({ params }) {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-[var(--background)] text-[var(--text)]">
 
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8">
+          <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] shadow-sm p-6 sm:p-8">
 
             <div className="mb-6">
 
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text)]">
                 Editar Tratamiento
               </h1>
 
@@ -577,7 +578,7 @@ export default function EditarTratamiento({ params }) {
 
                 <label
                   htmlFor="nombre"
-                  className="block text-sm font-medium text-gray-700 mb-1.5"
+                  className="block text-sm font-medium text-[var(--text)] mb-1.5"
                 >
                   Nombre{" "}
                   <span className="text-red-500">
@@ -631,7 +632,7 @@ export default function EditarTratamiento({ params }) {
 
                 <label
                   htmlFor="descripcion"
-                  className="block text-sm font-medium text-gray-700 mb-1.5"
+                  className="block text-sm font-medium text-[var(--text)] mb-1.5"
                 >
                   Descripción{" "}
                   <span className="text-red-500">
@@ -685,7 +686,7 @@ export default function EditarTratamiento({ params }) {
                     <span />
                   )}
 
-                  <p className="text-xs text-gray-400 shrink-0">
+                  <p className="text-xs text-[var(--text-secondary)] shrink-0">
                     {
                       descripcion.length
                     }
@@ -704,7 +705,7 @@ export default function EditarTratamiento({ params }) {
 
                   <label
                     htmlFor="precio"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="block text-sm font-medium text-[var(--text)] mb-1.5"
                   >
                     Precio{" "}
                     <span className="text-red-500">
@@ -714,7 +715,7 @@ export default function EditarTratamiento({ params }) {
 
                   <div className="relative">
 
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] text-sm">
                       $
                     </span>
 
@@ -780,7 +781,7 @@ export default function EditarTratamiento({ params }) {
 
                   <label
                     htmlFor="duracion"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="block text-sm font-medium text-[var(--text)] mb-1.5"
                   >
                     Duración (minutos){" "}
                     <span className="text-red-500">
@@ -835,45 +836,80 @@ export default function EditarTratamiento({ params }) {
               </div>
 
               {/* ESTADO */}
-
               <div>
-
                 <label
                   htmlFor="estado"
-                  className="block text-sm font-medium text-gray-700 mb-1.5"
+                  className="block text-sm font-medium text-[var(--text)] mb-1.5"
                 >
                   Estado
                 </label>
 
-                <select
-                  id="estado"
-                  value={estado}
-                  onChange={(e) =>
-                    setEstado(
-                      e.target.value
-                    )
-                  }
-                  className={inputClass(
-                    "estado"
-                  )}
-                >
-                  <option value="activo">
-                    Activo
-                  </option>
+                <div className="relative">
+                  <select
+                    id="estado"
+                    value={estado}
+                    onChange={(e) =>
+                      setEstado(
+                        e.target.value
+                      )
+                    }
+                    className="
+                      w-full
 
-                  <option value="inactivo">
-                    Inactivo
-                  </option>
+                      appearance-none
 
-                </select>
+                      px-3.5
+                      py-2.5
+                      pr-12
 
+                      border
+                      border-[var(--border)]
+
+                      rounded-lg
+
+                      text-sm
+                      text-[var(--text)]
+
+                      bg-[var(--input)]
+
+                      focus:outline-none
+                      focus:ring-2
+                      focus:ring-[var(--primary)]
+                      focus:border-[var(--primary)]
+
+                      transition-colors
+                    "
+                  >
+                    <option value="activo">
+                      Activo
+                    </option>
+
+                    <option value="inactivo">
+                      Inactivo
+                    </option>
+                  </select>
+
+                  <FaChevronDown
+                    className="
+                      pointer-events-none
+
+                      absolute
+                      right-4
+                      top-1/2
+                      -translate-y-1/2
+
+                      text-[var(--text-secondary)]
+                    "
+                    size={13}
+                  />
+                </div>
               </div>
 
               {/* IMAGEN */}
 
               <div>
 
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[var(--text)] mb-1.5">
                   Imagen del tratamiento
                 </label>
 
@@ -889,7 +925,7 @@ export default function EditarTratamiento({ params }) {
                       e.currentTarget.src =
                         "/images/tratamientos/placeholder.png"
                     }}
-                    className="w-24 h-24 object-cover rounded-lg border border-gray-200 shadow-sm shrink-0"
+                    className="w-24 h-24 object-cover rounded-lg border border-[var(--border)] shadow-sm shrink-0"
                   />
 
                   <div className="flex-1 min-w-0 w-full">
@@ -898,7 +934,7 @@ export default function EditarTratamiento({ params }) {
 
                       <label
                         htmlFor="file"
-                        className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text)] bg-[var(--surface-soft)] hover:bg-[var(--surface-hover)] cursor-pointer transition-colors"
                       >
                         <FaUpload
                           size={12}
@@ -939,7 +975,7 @@ export default function EditarTratamiento({ params }) {
 
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-2 truncate">
+                    <p className="text-xs text-[var(--text-secondary)] mt-2 truncate">
 
                       {file
                         ? `Nueva: ${file.name}`
@@ -972,7 +1008,7 @@ export default function EditarTratamiento({ params }) {
                   onClick={
                     handleDelete
                   }
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-red-200 rounded-lg text-sm font-medium text-red-600 bg-white hover:bg-red-50 transition-colors w-full sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-red-500/30 rounded-lg text-sm font-medium text-red-400 bg-red-500/15 hover:bg-red-500/25 transition-colors w-full sm:w-auto"
                 >
                   <FaTrash
                     size={12}
@@ -990,7 +1026,7 @@ export default function EditarTratamiento({ params }) {
                         "/tratamientos"
                       )
                     }
-                    className="w-full sm:w-auto px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+                    className="w-full sm:w-auto px-5 py-2.5 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text)] bg-[var(--surface-soft)] hover:bg-[var(--surface-hover)] transition-colors"
                   >
                     Cancelar
                   </button>
