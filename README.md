@@ -16,6 +16,7 @@ Control Dental está compuesto actualmente por:
 - API REST desarrollada con Node.js y Express.
 - Base de datos MySQL.
 - Gestión de imágenes mediante UploadThing.
+- Necesita tener npm install firebase-admin y realizar npm run db:migrate
 
 Durante el desarrollo local:
 
