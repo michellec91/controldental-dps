@@ -88,15 +88,14 @@ export default function Navbar() {
     // ESTILO DE LOS ENLACES
     // -----------------------------------------
     const linkClass = (href) => {
-        const active =
-            pathname === href
+    const active = pathname === href;
 
-        return `p-2.5 rounded-lg transition-colors ${
-            active
-                ? "bg-blue-50 text-blue-600"
-                : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-        }`
-    }
+    return `p-2.5 rounded-lg transition-colors ${
+        active
+        ? "bg-[var(--primary-soft)] text-[var(--primary)]"
+        : "text-[var(--text-secondary)] hover:text-[var(--primary)] hover:bg-[var(--surface-soft)]"
+    }`;
+    };
 
     // -----------------------------------------
     // CERRAR SESIÓN
@@ -108,7 +107,7 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="w-full bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+        <nav className="w-full bg-[var(--surface)] border-b border-[var(--border)] shadow-sm sticky top-0 z-40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 <div className="flex items-center justify-between h-16">
@@ -118,11 +117,11 @@ export default function Navbar() {
                         href="/dashboard"
                         className="flex items-center gap-2 shrink-0"
                     >
-                        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--primary-soft)] text-[var(--primary)]">
                             <FaTooth size={18} />
                         </span>
 
-                        <span className="text-base sm:text-lg font-semibold text-gray-800 hidden xs:inline">
+                        <span className="text-base sm:text-lg font-semibold text-[var(--text)] hidden xs:inline">
                             Control Dental
                         </span>
                     </Link>
@@ -200,7 +199,7 @@ export default function Navbar() {
                                 onClick={() =>
                                     setOpen(!open)
                                 }
-                                className="flex items-center justify-center w-10 h-10 text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-gray-50"
+                                className="flex items-center justify-center w-10 h-10 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors rounded-lg hover:bg-[var(--surface-soft)]"
                                 title="Cuenta"
                                 aria-label="Cuenta"
                                 aria-expanded={open}
@@ -232,16 +231,16 @@ export default function Navbar() {
                                     />
 
                                     {/* MENÚ DESPLEGABLE */}
-                                    <div className="absolute right-0 mt-2 w-56 sm:w-60 bg-white border border-gray-200 rounded-xl shadow-lg py-1.5 z-50">
+                                    <div className="absolute right-0 mt-2 w-56 sm:w-60 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg py-1.5 z-50">
 
                                         {/* INFORMACIÓN DEL USUARIO */}
-                                        <div className="px-4 py-3 border-b border-gray-100">
-                                            <p className="text-sm font-semibold text-gray-800 truncate">
+                                        <div className="px-4 py-3 border-b border-[var(--border)]">
+                                            <p className="text-sm font-semibold text-[var(--text)]">
                                                 {usuario?.nombre ??
                                                     "Administrador"}
                                             </p>
 
-                                            <p className="text-xs text-gray-500">
+                                            <p className="text-xs text-[var(--text-secondary)]">
                                                 {usuario?.rol ??
                                                     "Administrador"}
                                             </p>
@@ -252,7 +251,7 @@ export default function Navbar() {
 
                                             <Link
                                                 href="/perfil"
-                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text)] hover:bg-[var(--surface-soft)] transition-colors"
                                                 onClick={() =>
                                                     setOpen(false)
                                                 }
@@ -269,7 +268,7 @@ export default function Navbar() {
 
                                             <Link
                                                 href="/perfil/cambiar-password"
-                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text)] hover:bg-[var(--surface-soft)] transition-colors"
                                                 onClick={() =>
                                                     setOpen(false)
                                                 }
@@ -287,11 +286,11 @@ export default function Navbar() {
                                         </div>
 
                                         {/* CERRAR SESIÓN */}
-                                        <div className="border-t border-gray-100 pt-1">
+                                        <div className="border-t border-[var(--border)] pt-1">
 
                                             <button
                                                 type="button"
-                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left"
                                                 onClick={
                                                     handleCerrarSesion
                                                 }

@@ -1,6 +1,7 @@
 .page {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--background);
+  color: var(--text);
 }
 
 .container {
@@ -21,12 +22,155 @@
   font-size: 26px;
   font-weight: 700;
 
-  color: #1f2937;
+  color: var(--text);
 }
 
 .header p {
   margin: 0;
 
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 14px;
+}
+
+/* =========================================
+   APARIENCIA
+========================================= */
+
+.appearanceCard {
+  width: 100%;
+  margin-top: 24px;
+  padding: 24px;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.appearanceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+
+  margin-bottom: 22px;
+}
+
+.appearanceHeader h2 {
+  margin: 0 0 6px;
+
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.appearanceHeader p {
+  margin: 0;
+
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.currentTheme {
+  flex-shrink: 0;
+
+  padding: 7px 12px;
+
+  background: var(--primary-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+
+  color: var(--primary);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.themeOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.themeButton {
+  min-height: 92px;
+  padding: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  background: var(--surface-soft);
+  color: var(--text);
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  cursor: pointer;
+  text-align: left;
+}
+
+.themeButton:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+}
+
+.themeButtonActive {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.themeIcon {
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+
+  font-size: 22px;
+}
+
+.themeButton > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.themeButton strong {
+  display: block;
+
+  color: var(--text);
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.themeButton small {
+  display: block;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+@media (max-width: 800px) {
+  .appearanceHeader {
+    flex-direction: column;
+  }
+
+  .themeOptions {
+    grid-template-columns: 1fr;
+  }
 }
