@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
   useEffect(() => {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.replace("/login");
-  }, []);
+    router.replace("/login");
+  }, [router]);
 
   return null;
 }

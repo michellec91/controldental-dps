@@ -117,8 +117,8 @@ export default function PerfilCard() {
     }
   };
 
-  const handleCerrarSesion = () => {
-    cerrarSesion();
+  const handleCerrarSesion = async () => {
+    await cerrarSesion();
     router.replace("/login");
   };
 

@@ -100,8 +100,8 @@ export default function Navbar() {
     // -----------------------------------------
     // CERRAR SESIÓN
     // -----------------------------------------
-    const handleCerrarSesion = () => {
-        cerrarSesion()
+    const handleCerrarSesion = async () => {
+        await cerrarSesion()
         setOpen(false)
         router.replace("/login")
     }

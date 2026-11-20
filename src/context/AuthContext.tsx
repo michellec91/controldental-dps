@@ -2,11 +2,18 @@
 
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
 } from "react";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import { obtenerFirebaseAuth } from "../lib/firebase";
+import { loginUsuario } from "../services/usuariosService";
 
 export interface UsuarioSesion {
   id: string;
@@ -21,70 +28,130 @@ export interface UsuarioSesion {
 
 interface AuthContextType {
   usuario: UsuarioSesion | null;
-
-  iniciarSesion: (usuario: UsuarioSesion) => void;
-
-  actualizarUsuarioSesion: (
-    datos: Partial<UsuarioSesion>
-  ) => void;
-
-  cerrarSesion: () => void;
-
+  iniciarSesion: (correo: string, contrasena: string) => Promise<void>;
+  actualizarUsuarioSesion: (datos: Partial<UsuarioSesion>) => void;
+  cerrarSesion: () => Promise<void>;
   cargando: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const [usuario, setUsuario] =
-    useState<UsuarioSesion | null>(null);
+function esAdministradorActivo(usuario: UsuarioSesion): boolean {
+  return (
+    usuario.rol.toLowerCase() === "administrador" &&
+    usuario.estado.toLowerCase() === "activo"
+  );
+}
 
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [usuario, setUsuario] = useState<UsuarioSesion | null>(null);
   const [cargando, setCargando] = useState(true);
 
-  // Recuperar sesión guardada cuando inicia la aplicación
   useEffect(() => {
+    let cancelarSuscripcion: (() => void) | undefined;
+
     try {
-      const sesionGuardada =
-        localStorage.getItem("usuario");
+      cancelarSuscripcion = onAuthStateChanged(
+        obtenerFirebaseAuth(),
+        (usuarioFirebase) => {
+          try {
+            const sesionGuardada = localStorage.getItem("usuario");
+            const usuarioGuardado = sesionGuardada
+              ? (JSON.parse(sesionGuardada) as UsuarioSesion)
+              : null;
 
-      if (sesionGuardada) {
-        const usuarioGuardado: UsuarioSesion =
-          JSON.parse(sesionGuardada);
+            const mismaCuenta =
+              usuarioFirebase?.email?.toLowerCase() ===
+              usuarioGuardado?.correo?.toLowerCase();
 
-        setUsuario(usuarioGuardado);
-      }
-    } catch (error) {
-      console.error(
-        "Error al recuperar la sesión:",
-        error
+            if (
+              usuarioFirebase &&
+              usuarioGuardado &&
+              mismaCuenta &&
+              esAdministradorActivo(usuarioGuardado)
+            ) {
+              setUsuario(usuarioGuardado);
+            } else {
+              setUsuario(null);
+              localStorage.removeItem("usuario");
+            }
+          } catch {
+            setUsuario(null);
+            localStorage.removeItem("usuario");
+          } finally {
+            setCargando(false);
+          }
+        },
+        () => {
+          setUsuario(null);
+          localStorage.removeItem("usuario");
+          setCargando(false);
+        }
       );
-
-      localStorage.removeItem("usuario");
-    } finally {
+    } catch {
+      setUsuario(null);
       setCargando(false);
     }
+
+    return () => cancelarSuscripcion?.();
   }, []);
 
-  // Iniciar sesión
-  function iniciarSesion(usuarioNuevo: UsuarioSesion) {
-    setUsuario(usuarioNuevo);
+  async function iniciarSesion(correo: string, contrasena: string) {
+    const correoNormalizado = correo.trim().toLowerCase();
+    const perfil = await loginUsuario(correoNormalizado, contrasena);
 
-    localStorage.setItem(
-      "usuario",
-      JSON.stringify(usuarioNuevo)
-    );
+    if (perfil.rol.toLowerCase() !== "administrador") {
+      throw new Error("Esta cuenta no tiene permisos administrativos.");
+    }
+
+    if (perfil.estado.toLowerCase() !== "activo") {
+      throw new Error("Esta cuenta no se encuentra activa.");
+    }
+
+    try {
+      await signInWithEmailAndPassword(
+        obtenerFirebaseAuth(),
+        correoNormalizado,
+        contrasena
+      );
+    } catch (error) {
+      const codigo = (error as { code?: string })?.code;
+
+      if (codigo === "auth/invalid-credential") {
+        throw new Error("Correo o contraseña incorrectos en Firebase.");
+      }
+
+      if (codigo === "auth/user-not-found" || codigo === "auth/wrong-password") {
+        throw new Error("Correo o contraseña incorrectos en Firebase.");
+      }
+
+      if (codigo === "auth/network-request-failed") {
+        throw new Error("No fue posible conectar con Firebase Authentication.");
+      }
+
+      if (codigo === "auth/user-disabled") {
+        throw new Error("La cuenta de Firebase está deshabilitada.");
+      }
+
+      throw error;
+    }
+
+    const nuevaSesion: UsuarioSesion = {
+      id: String(perfil.id_usuario),
+      nombre: perfil.nombre,
+      apellido: perfil.apellido,
+      correo: perfil.correo,
+      telefono: perfil.telefono,
+      rol: perfil.rol,
+      estado: perfil.estado,
+      imagenPerfil: perfil.imagen_perfil || undefined,
+    };
+
+    localStorage.setItem("usuario", JSON.stringify(nuevaSesion));
+    setUsuario(nuevaSesion);
   }
 
-  // Actualizar datos del usuario guardado
-  function actualizarUsuarioSesion(
-    datos: Partial<UsuarioSesion>
-  ) {
+  function actualizarUsuarioSesion(datos: Partial<UsuarioSesion>) {
     setUsuario((usuarioActual) => {
       if (!usuarioActual) {
         return null;
@@ -95,19 +162,15 @@ export function AuthProvider({
         ...datos,
       };
 
-      localStorage.setItem(
-        "usuario",
-        JSON.stringify(usuarioActualizado)
-      );
-
+      localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
       return usuarioActualizado;
     });
   }
 
-  // Cerrar sesión
-  function cerrarSesion() {
-    setUsuario(null);
+  async function cerrarSesion() {
+    await signOut(obtenerFirebaseAuth());
     localStorage.removeItem("usuario");
+    setUsuario(null);
   }
 
   return (
@@ -129,9 +192,7 @@ export function useAuth() {
   const contexto = useContext(AuthContext);
 
   if (!contexto) {
-    throw new Error(
-      "useAuth debe utilizarse dentro de AuthProvider."
-    );
+    throw new Error("useAuth debe utilizarse dentro de AuthProvider.");
   }
 
   return contexto;

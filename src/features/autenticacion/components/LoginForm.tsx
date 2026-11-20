@@ -4,7 +4,6 @@ import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./LoginForm.module.css";
-import { loginUsuario } from "../../../services/usuariosService";
 import { useAuth } from "../../../context/AuthContext";
 
 export default function LoginForm() {
@@ -29,37 +28,7 @@ export default function LoginForm() {
     try {
       setCargando(true);
 
-      // El backend valida correo + contraseña con bcrypt.
-      const usuario = await loginUsuario(
-        correo.trim(),
-        contrasena
-      );
-
-      // Esta página es exclusivamente administrativa.
-      if (usuario.rol.toLowerCase() !== "administrador") {
-        setError("Esta cuenta no tiene permisos administrativos.");
-        return;
-      }
-
-      // Aunque el backend ya lo comprueba,
-      // también lo validamos en el frontend.
-      if (usuario.estado.toLowerCase() !== "activo") {
-        setError("Esta cuenta no se encuentra activa.");
-        return;
-      }
-
-      // Adaptamos los nombres de la BD a los que usa AuthContext.
-      iniciarSesion({
-        id: String(usuario.id_usuario),
-        nombre: usuario.nombre,
-        apellido: usuario.apellido,
-        correo: usuario.correo,
-        telefono: usuario.telefono,
-        rol: usuario.rol,
-        estado: usuario.estado,
-        imagenPerfil:
-          usuario.imagen_perfil || undefined,
-      });
+      await iniciarSesion(correo, contrasena);
 
       router.push("/dashboard");
     } catch (error) {
@@ -67,7 +36,7 @@ export default function LoginForm() {
         setError(error.message);
       } else {
         setError(
-          "No fue posible conectar con el servidor. Verifica que la API esté activa."
+          "No fue posible iniciar sesión. Verifica la conexión."
         );
       }
     } finally {
