@@ -6,6 +6,16 @@ El sistema permite administrar citas, solicitudes, tratamientos, agenda, horario
 
 Proyecto desarrollado para la asignatura **DPS941 – Universidad Don Bosco, Ciclo II 2026**.
 
+## Enlaces y mockups
+
+- **Aplicación web:** [Control Dental en Vercel](https://controldental-dps.vercel.app/login).
+- **Aplicación móvil complementaria:** [ControlDentalMobile](https://github.com/michellec91/ControlDentalMobile).
+- **Mockups de Figma (13 pantallas):** [ver PDF completo](docs/mockups/mockups-web.pdf).
+
+[![Vista previa de los mockups administrativos](docs/mockups/vista-previa-web.png)](docs/mockups/mockups-web.pdf)
+
+Los mockups muestran la propuesta de diseño de acceso administrativo, dashboard, tratamientos, solicitudes, agenda y perfil. Pueden existir diferencias frente a la versión implementada.
+
 ---
 
 ## Aplicación
@@ -16,7 +26,9 @@ Control Dental está compuesto actualmente por:
 - API REST desarrollada con Node.js y Express.
 - Base de datos MySQL.
 - Gestión de imágenes mediante UploadThing.
-- Necesita tener npm install firebase-admin y realizar npm run db:migrate
+- Firebase Authentication para el acceso con correo y contraseña; validación del rol administrativo mediante la API.
+
+**Despliegue:** el frontend está publicado en Vercel y la API en Render. Los módulos administrativos que utilizan MySQL requieren una base de datos accesible desde Render; una instalación local con XAMPP no habilita por sí sola las operaciones desde la URL pública.
 
 Durante el desarrollo local:
 
@@ -53,14 +65,16 @@ http://localhost:3001
 
 ### Servicios adicionales
 
+- Firebase Authentication para autenticación con correo y contraseña.
 - UploadThing para almacenamiento de imágenes.
+- Vercel y Render para los servicios publicados.
 - Git y GitHub para control de versiones.
 
 ---
 
 ## Funcionalidades
 
-- Autenticación de administrador.
+- Autenticación de administrador con Firebase Authentication y verificación de acceso mediante API/MySQL.
 - Contraseñas protegidas mediante bcrypt.
 - Rutas administrativas protegidas.
 - Dashboard administrativo dinámico.
@@ -89,6 +103,9 @@ Usuario administrador
         ▼
 Next.js + React
 Frontend administrativo
+        │
+        ├── Firebase Authentication
+        │   (identidad y sesión)
         │
         │ HTTP / API REST
         ▼
@@ -288,9 +305,15 @@ con:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_FIREBASE_API_KEY=tu_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=tu_proyecto.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=tu_proyecto
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=tu_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=tu_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=tu_app_id
 ```
 
-Las credenciales y tokens privados no deben subirse al repositorio.
+Configurar también el token de UploadThing si se utiliza la carga de imágenes. **No publicar contraseñas, tokens privados ni archivos `.env` reales en el repositorio.**
 
 ---
 
@@ -389,15 +412,9 @@ Los seeders verifican la existencia de los registros antes de insertarlos para e
 
 ## Autenticación
 
-El inicio de sesión se realiza mediante:
+El acceso web con correo y contraseña utiliza **Firebase Authentication** para identificar al usuario y mantener la sesión. La API (`POST /usuarios/login`) consulta MySQL para validar el acceso administrativo; el backend conserva la verificación de contraseñas mediante `bcrypt`.
 
-```text
-POST /usuarios/login
-```
-
-Las contraseñas se almacenan utilizando bcrypt.
-
-El frontend conserva la información básica de la sesión del administrador y utiliza rutas protegidas para evitar el acceso no autorizado al panel administrativo.
+Las rutas protegidas restringen el acceso al panel administrativo. La conexión a MySQL debe estar disponible para completar el ingreso.
 
 ---
 
@@ -470,21 +487,9 @@ controldental-dps/
 
 ---
 
-## Credenciales de administrador de desarrollo
+## Seguridad de acceso
 
-Para acceder al panel administrativo después de ejecutar los seeders:
-
-```text
-Correo:
-admin@controldental.com
-
-Contraseña:
-Admin1234
-```
-
-Estas credenciales son únicamente para desarrollo y pruebas.
-
-**No deben utilizarse como credenciales de producción.**
+Las credenciales de prueba deben administrarse fuera del repositorio y no publicarse en el README. Configurar las cuentas de Firebase Authentication y los registros de administradores según el entorno utilizado.
 
 ---
 
@@ -493,6 +498,12 @@ Estas credenciales son únicamente para desarrollo y pruebas.
 ```text
 https://github.com/michellec91/controldental-dps
 ```
+
+---
+
+## Licencia Creative Commons
+
+El repositorio incluye [**Creative Commons Attribution 4.0 International (CC BY 4.0)**](LICENSE.md), aplicable a las contribuciones originales cuyos derechos posee el equipo. Los componentes, imágenes y recursos de terceros mantienen sus propias licencias y condiciones de uso.
 
 ---
 
